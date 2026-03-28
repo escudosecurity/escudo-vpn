@@ -9,83 +9,72 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar surface">
-      <div>
-        <p class="eyebrow">Escudo Pearl</p>
-        <h1>Windows</h1>
-      </div>
-      <span id="plan-badge" class="pill">Not signed in</span>
+    <header class="brand-head">
+      <p class="brand-title">Escudo</p>
+      <p class="brand-status" id="vpn-state-value">Disconnected</p>
     </header>
 
-    <section class="surface hero-card">
-      <div class="hero-top">
+    <section class="surface network-card">
+      <div class="card-topline">
+        <span class="eyebrow">Current Network</span>
+        <span id="plan-badge" class="plan-pill">Not signed in</span>
+      </div>
+
+      <div class="network-main">
         <div>
-          <p class="eyebrow">Current Route</p>
-          <h2 id="route-title">Choose a route</h2>
-          <p id="route-subtitle">Pair or sign in, then choose Residential or Standard below.</p>
+          <h1 id="route-title">Choose a route</h1>
+          <p id="route-subtitle">Pair or sign in first, then select a route.</p>
         </div>
-        <div class="signal-pill">
-          <span id="vpn-state-value">Disconnected</span>
-        </div>
+        <button id="refresh-servers-btn" class="ghost-btn">Refresh</button>
       </div>
 
-      <div class="hero-glow">
-        <div class="hero-grid"></div>
-        <div class="hero-badge">
-          <span class="hero-badge-label">Escudo</span>
-          <strong id="selected-route-summary">No route selected</strong>
-          <small>Connect in one click after pairing.</small>
-        </div>
-      </div>
-
-      <div class="hero-meta">
-        <div class="mini-metric">
+      <div class="network-grid">
+        <div class="metric-card">
           <span>Login</span>
           <strong id="logged-in-value">Offline</strong>
         </div>
-        <div class="mini-metric">
+        <div class="metric-card">
           <span>Route</span>
           <strong id="selected-route-value">None</strong>
         </div>
       </div>
+    </section>
 
-      <div class="cta-row">
-        <button id="connect-btn" class="primary-btn" disabled>Connect</button>
-        <button id="disconnect-btn" class="ghost-btn" disabled>Disconnect</button>
-      </div>
+    <section class="connect-stage">
+      <button id="connect-btn" class="connect-orb" disabled aria-label="Connect">
+        <span class="connect-ring">
+          <span class="power-mark">⏻</span>
+        </span>
+      </button>
+      <p class="connect-caption" id="selected-route-summary">No route selected</p>
+      <button id="disconnect-btn" class="text-btn" disabled>Disconnect</button>
     </section>
 
     <section class="surface prereq-surface">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Readiness</p>
-          <h2>Windows setup</h2>
-        </div>
+      <div class="card-topline">
+        <span class="eyebrow">Readiness</span>
       </div>
-      <div class="status-pair">
-        <div class="fact-card small-card">
+      <div class="prereq-grid">
+        <div class="metric-card">
           <span>Secure network component</span>
           <strong id="wireguard-value">Checking</strong>
         </div>
-        <div class="fact-card small-card">
+        <div class="metric-card">
           <span>App runtime</span>
           <strong id="webview2-value">Checking</strong>
         </div>
       </div>
-      <div class="cta-row">
+      <div class="button-row">
         <button id="install-wireguard-btn" class="ghost-btn">Install network component</button>
         <button id="install-webview2-btn" class="ghost-btn">Install runtime</button>
       </div>
       <button id="refresh-prereqs-btn" class="text-btn">Refresh readiness</button>
-      <p id="prereq-message" class="status-line"></p>
+      <p id="prereq-message" class="status-copy"></p>
     </section>
 
     <section class="surface auth-surface">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Sign In</p>
-          <h2>Bring your account onto Windows</h2>
-        </div>
+      <div class="card-topline">
+        <span class="eyebrow">Sign In</span>
       </div>
 
       <div class="method-switch">
@@ -95,21 +84,9 @@
       </div>
 
       <div id="mode-pair" class="mode-panel active">
-        <div class="pair-guide">
-          <div class="pair-step">
-            <span class="step-num">1</span>
-            <div>
-              <strong>Generate on Android</strong>
-              <small>Open <b>Conta</b> then tap <b>Gerar QR e link</b>.</small>
-            </div>
-          </div>
-          <div class="pair-step">
-            <span class="step-num">2</span>
-            <div>
-              <strong>Scan on Windows</strong>
-              <small>Point this camera window at the QR shown on your phone.</small>
-            </div>
-          </div>
+        <div class="pair-card">
+          <strong>Generate on Android</strong>
+          <p>Open <b>Conta</b> and tap <b>Gerar QR e link</b>. The real QR is shown on Android, not here.</p>
         </div>
 
         <div class="scanner-box">
@@ -117,14 +94,14 @@
             <div class="camera-target">
               <div class="camera-target-frame"></div>
             </div>
-            <p>This is the Windows camera area. The real QR is generated on your Android app.</p>
+            <p>Open the Windows camera here, then point it at the QR from your Android app.</p>
           </div>
           <video id="scanner-video" autoplay playsinline muted></video>
           <div class="scanner-frame"></div>
-          <div id="scanner-status" class="scanner-status">Click start to open the camera and scan the QR from your Android app.</div>
+          <div id="scanner-status" class="scanner-status">Click start to scan the Android QR.</div>
         </div>
 
-        <div class="cta-row">
+        <div class="button-row">
           <button id="start-scan-btn" class="primary-btn">Start QR Scan</button>
           <button id="stop-scan-btn" class="ghost-btn" disabled>Stop</button>
         </div>
@@ -141,11 +118,11 @@
           <span>16-digit account code</span>
           <input id="code-input" type="text" placeholder="1234-5678-9012-3456" />
         </label>
-        <div class="cta-row">
+        <div class="button-row">
           <button id="code-login-btn" class="primary-btn">Sign In With Code</button>
           <button id="create-code-btn" class="ghost-btn">Create New Free Account</button>
         </div>
-        <p id="new-code-output" class="status-line hidden"></p>
+        <p id="new-code-output" class="status-copy hidden"></p>
       </div>
 
       <div id="mode-email" class="mode-panel">
@@ -157,40 +134,34 @@
           <span>Password</span>
           <input id="password-input" type="password" placeholder="Password" />
         </label>
-        <div class="cta-row">
+        <div class="button-row">
           <button id="email-login-btn" class="primary-btn">Sign In</button>
           <button id="register-btn" class="ghost-btn">Create Account</button>
         </div>
       </div>
 
-      <p id="auth-message" class="status-line"></p>
+      <p id="auth-message" class="status-copy"></p>
     </section>
 
     <section class="surface server-surface">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Routes</p>
-          <h2>Residential first. Standard below.</h2>
-        </div>
-        <button id="refresh-servers-btn" class="ghost-btn">Refresh</button>
+      <div class="card-topline">
+        <span class="eyebrow">Routes</span>
       </div>
 
-      <div class="server-stack">
-        <div class="route-block">
-          <div class="route-block-head">
-            <h3>Residential</h3>
-            <span class="route-note">US, UK, EU</span>
-          </div>
-          <div id="residential-list" class="server-list"></div>
+      <div class="route-section">
+        <div class="route-headline">
+          <h2>Residential</h2>
+          <span class="route-note">US, UK, EU</span>
         </div>
+        <div id="residential-list" class="server-list"></div>
+      </div>
 
-        <div class="route-block">
-          <div class="route-block-head">
-            <h3>Standard</h3>
-            <span class="route-note">Global fleet</span>
-          </div>
-          <div id="standard-list" class="server-list"></div>
+      <div class="route-section">
+        <div class="route-headline">
+          <h2>Standard</h2>
+          <span class="route-note">Global fleet</span>
         </div>
+        <div id="standard-list" class="server-list"></div>
       </div>
     </section>
   </div>

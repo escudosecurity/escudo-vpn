@@ -27,6 +27,8 @@
   const routeSubtitle = document.getElementById("route-subtitle");
   const residentialList = document.getElementById("residential-list");
   const standardList = document.getElementById("standard-list");
+  const authSurface = document.querySelector(".auth-surface");
+  const serverSurface = document.querySelector(".server-surface");
   const scannerVideo = document.getElementById("scanner-video");
   const scannerStatus = document.getElementById("scanner-status");
   const startScanBtn = document.getElementById("start-scan-btn");
@@ -74,6 +76,11 @@
       default:
         return "Free";
     }
+  }
+
+  function formatVpnLabel(status) {
+    if (status?.vpn?.connected) return "Protected";
+    return status?.logged_in ? "Not connected" : "Offline";
   }
 
   function normalizeCode(value) {
@@ -143,10 +150,12 @@
     try {
       const status = await invoke("get_status");
       loggedInValue.textContent = status.logged_in ? "Signed in" : "Offline";
-      vpnStateValue.textContent = status.vpn.connected ? "Connected" : "Disconnected";
+      vpnStateValue.textContent = formatVpnLabel(status);
       selectedRouteValue.textContent = status.vpn.server_name || "None";
       selectedRouteSummary.textContent = status.vpn.server_name || (selectedServer ? selectedServer.location : "No route selected");
       disconnectBtn.disabled = !status.vpn.connected;
+      authSurface.style.display = status.logged_in ? "none" : "";
+      serverSurface.style.display = status.logged_in ? "" : "none";
 
       if (status.logged_in) {
         try {
@@ -209,7 +218,7 @@
       setMessage("Signed in on Windows.");
       await refreshStatus();
       await refreshServers();
-      routeSubtitle.textContent = "Choose a route below, then connect.";
+      routeSubtitle.textContent = "Choose a route below, then press the power button.";
     } catch (error) {
       setMessage(error.message || String(error), true);
     }
@@ -244,6 +253,7 @@
       });
       setMessage(`Connected to ${selectedServer.location}.`);
       selectedRouteSummary.textContent = `${selectedServer.location} active`;
+      routeSubtitle.textContent = "Your traffic is encrypted and your selected exit is live.";
       await refreshStatus();
     } catch (error) {
       setMessage(error.message || String(error), true);
@@ -255,6 +265,7 @@
       await invoke("disconnect");
       setMessage("Disconnected.");
       selectedRouteSummary.textContent = selectedServer ? `${selectedServer.location} selected` : "No route selected";
+      routeSubtitle.textContent = "Choose a route below, then press the power button.";
       await refreshStatus();
     } catch (error) {
       setMessage(error.message || String(error), true);
