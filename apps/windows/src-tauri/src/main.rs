@@ -12,7 +12,7 @@ use serde::Serialize;
 use std::path::PathBuf;
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
-use tauri::State;
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Position, Size, State};
 use vpn::{AppState, VpnState};
 
 #[derive(Debug, Serialize)]
@@ -380,6 +380,21 @@ fn run_powershell(script: &str) -> Result<(), String> {
 fn main() {
     tauri::Builder::default()
         .manage(AppState::new())
+        .setup(|app| {
+            if let Some(window) = app.get_webview_window("main") {
+                let width = 470u32;
+                let height = 860u32;
+                let _ = window.set_size(Size::Physical(PhysicalSize::new(width, height)));
+
+                if let Ok(Some(monitor)) = window.current_monitor() {
+                    let monitor_size = monitor.size();
+                    let x = monitor_size.width.saturating_sub(width + 24) as i32;
+                    let y = monitor_size.height.saturating_sub(height + 56) as i32;
+                    let _ = window.set_position(Position::Physical(PhysicalPosition::new(x, y)));
+                }
+            }
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             login,
             register,

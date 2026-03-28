@@ -10,14 +10,14 @@
   "app": {
     "windows": [
       {
-        "width": 420,
-        "height": 700,
-        "resizable": true,
+        "width": 470,
+        "height": 860,
+        "resizable": false,
         "fullscreen": false,
-        "minWidth": 380,
-        "minHeight": 600,
+        "minWidth": 470,
+        "minHeight": 860,
         "decorations": true,
-        "center": true
+        "center": false
       }
     ],
     "security": {

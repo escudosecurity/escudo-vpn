@@ -9,173 +9,193 @@
 </head>
 <body>
   <div class="app-shell">
-    <aside class="hero-rail">
-      <div class="brand-lockup">
+    <header class="topbar surface">
+      <div>
         <p class="eyebrow">Escudo Pearl</p>
-        <h1>Windows, without the friction.</h1>
-        <p class="hero-copy">Scan from Android or enter your account code, choose a route, and connect. No control-panel clutter.</p>
+        <h1>Windows</h1>
+      </div>
+      <span id="plan-badge" class="pill">Not signed in</span>
+    </header>
+
+    <section class="surface hero-card">
+      <div class="hero-top">
+        <div>
+          <p class="eyebrow">Current Route</p>
+          <h2 id="route-title">Choose a route</h2>
+          <p id="route-subtitle">Pair or sign in, then choose Residential or Standard below.</p>
+        </div>
+        <div class="signal-pill">
+          <span id="vpn-state-value">Disconnected</span>
+        </div>
       </div>
 
-      <section class="surface compact-surface">
-        <div class="mini-head">
-          <span class="eyebrow">Account</span>
-          <span id="plan-badge" class="pill">Not signed in</span>
+      <div class="hero-glow">
+        <div class="hero-grid"></div>
+        <div class="hero-badge">
+          <span class="hero-badge-label">Escudo</span>
+          <strong id="selected-route-summary">No route selected</strong>
+          <small>Connect in one click after pairing.</small>
         </div>
-        <div class="mini-metrics">
-          <div class="mini-metric">
-            <span>Login</span>
-            <strong id="logged-in-value">Offline</strong>
-          </div>
-          <div class="mini-metric">
-            <span>VPN</span>
-            <strong id="vpn-state-value">Disconnected</strong>
-          </div>
-          <div class="mini-metric">
-            <span>Route</span>
-            <strong id="selected-route-value">None</strong>
-          </div>
-        </div>
-      </section>
+      </div>
 
-      <section class="surface compact-surface prereq-surface">
-        <div class="mini-head">
-          <div>
-            <p class="eyebrow">Readiness</p>
-            <h2>Windows setup</h2>
-          </div>
+      <div class="hero-meta">
+        <div class="mini-metric">
+          <span>Login</span>
+          <strong id="logged-in-value">Offline</strong>
         </div>
-        <div class="status-stack">
-          <div class="fact-card small-card">
-            <span>Secure network component</span>
-            <strong id="wireguard-value">Checking</strong>
-          </div>
-          <div class="fact-card small-card">
-            <span>App runtime</span>
-            <strong id="webview2-value">Checking</strong>
-          </div>
+        <div class="mini-metric">
+          <span>Route</span>
+          <strong id="selected-route-value">None</strong>
         </div>
-        <div class="row-actions">
-          <button id="install-wireguard-btn" class="ghost-btn">Install network component</button>
-          <button id="install-webview2-btn" class="ghost-btn">Install runtime</button>
-        </div>
-        <button id="refresh-prereqs-btn" class="text-btn">Refresh readiness</button>
-        <p id="prereq-message" class="status-line"></p>
-      </section>
-    </aside>
+      </div>
 
-    <main class="main-stage">
-      <section class="surface route-surface">
-        <div class="surface-head route-head">
-          <div>
-            <p class="eyebrow">Current Route</p>
-            <h2 id="route-title">Choose a route</h2>
-            <p id="route-subtitle">Sign in, then pick Residential or Standard below.</p>
-          </div>
-          <div class="hero-actions">
-            <button id="connect-btn" class="primary-btn" disabled>Connect</button>
-            <button id="disconnect-btn" class="ghost-btn" disabled>Disconnect</button>
-          </div>
-        </div>
-        <div class="route-glow">
-          <div class="glow-orb"></div>
-          <div class="glow-grid"></div>
-          <div class="route-card">
-            <span class="route-label">Escudo Windows</span>
-            <strong id="selected-route-summary">No route selected</strong>
-            <small>Pair once, then connect in one click.</small>
-          </div>
-        </div>
-      </section>
+      <div class="cta-row">
+        <button id="connect-btn" class="primary-btn" disabled>Connect</button>
+        <button id="disconnect-btn" class="ghost-btn" disabled>Disconnect</button>
+      </div>
+    </section>
 
-      <section class="surface login-surface">
-        <div class="surface-head">
-          <div>
-            <p class="eyebrow">Sign In</p>
-            <h2>Bring your account onto Windows</h2>
-          </div>
+    <section class="surface prereq-surface">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Readiness</p>
+          <h2>Windows setup</h2>
         </div>
-
-        <div class="method-switch">
-          <button class="mode-chip active" data-mode="pair">Scan QR</button>
-          <button class="mode-chip" data-mode="code">Account Code</button>
-          <button class="mode-chip" data-mode="email">Email</button>
+      </div>
+      <div class="status-pair">
+        <div class="fact-card small-card">
+          <span>Secure network component</span>
+          <strong id="wireguard-value">Checking</strong>
         </div>
-
-        <div id="mode-pair" class="mode-panel active">
-          <p class="helper">On Android: <strong>Conta</strong> -> <strong>Gerar QR e link</strong>. Scan it here or paste the pairing link.</p>
-          <div class="scanner-box">
-            <video id="scanner-video" autoplay playsinline muted></video>
-            <div class="scanner-frame"></div>
-            <div id="scanner-status" class="scanner-status">Click start to open the camera and scan the QR.</div>
-          </div>
-          <div class="row-actions">
-            <button id="start-scan-btn" class="primary-btn">Start QR Scan</button>
-            <button id="stop-scan-btn" class="ghost-btn" disabled>Stop</button>
-          </div>
-          <label class="field">
-            <span>Pairing link</span>
-            <input id="pair-link-input" type="text" placeholder="escudo://pair?token=..." />
-          </label>
-          <button id="pair-link-btn" class="ghost-btn full-btn">Use Pairing Link</button>
+        <div class="fact-card small-card">
+          <span>App runtime</span>
+          <strong id="webview2-value">Checking</strong>
         </div>
+      </div>
+      <div class="cta-row">
+        <button id="install-wireguard-btn" class="ghost-btn">Install network component</button>
+        <button id="install-webview2-btn" class="ghost-btn">Install runtime</button>
+      </div>
+      <button id="refresh-prereqs-btn" class="text-btn">Refresh readiness</button>
+      <p id="prereq-message" class="status-line"></p>
+    </section>
 
-        <div id="mode-code" class="mode-panel">
-          <label class="field">
-            <span>16-digit account code</span>
-            <input id="code-input" type="text" placeholder="1234-5678-9012-3456" />
-          </label>
-          <div class="row-actions">
-            <button id="code-login-btn" class="primary-btn">Sign In With Code</button>
-            <button id="create-code-btn" class="ghost-btn">Create New Free Account</button>
-          </div>
-          <p id="new-code-output" class="helper hidden"></p>
+    <section class="surface auth-surface">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Sign In</p>
+          <h2>Bring your account onto Windows</h2>
         </div>
+      </div>
 
-        <div id="mode-email" class="mode-panel">
-          <label class="field">
-            <span>Email</span>
-            <input id="email-input" type="email" placeholder="you@example.com" />
-          </label>
-          <label class="field">
-            <span>Password</span>
-            <input id="password-input" type="password" placeholder="Password" />
-          </label>
-          <div class="row-actions">
-            <button id="email-login-btn" class="primary-btn">Sign In</button>
-            <button id="register-btn" class="ghost-btn">Create Account</button>
-          </div>
-        </div>
+      <div class="method-switch">
+        <button class="mode-chip active" data-mode="pair">Scan QR</button>
+        <button class="mode-chip" data-mode="code">Account Code</button>
+        <button class="mode-chip" data-mode="email">Email</button>
+      </div>
 
-        <p id="auth-message" class="status-line"></p>
-      </section>
-
-      <section class="surface server-surface">
-        <div class="surface-head">
-          <div>
-            <p class="eyebrow">Routes</p>
-            <h2>Residential first. Standard below.</h2>
-          </div>
-          <button id="refresh-servers-btn" class="ghost-btn">Refresh Routes</button>
-        </div>
-
-        <div class="server-columns">
-          <div class="server-column residential-column">
-            <div class="column-header">
-              <h3 class="column-title">Residential</h3>
-              <span class="column-note">US, UK, EU</span>
+      <div id="mode-pair" class="mode-panel active">
+        <div class="pair-guide">
+          <div class="pair-step">
+            <span class="step-num">1</span>
+            <div>
+              <strong>Generate on Android</strong>
+              <small>Open <b>Conta</b> then tap <b>Gerar QR e link</b>.</small>
             </div>
-            <div id="residential-list" class="server-list"></div>
           </div>
-          <div class="server-column">
-            <div class="column-header">
-              <h3 class="column-title">Standard</h3>
-              <span class="column-note">Global fleet</span>
+          <div class="pair-step">
+            <span class="step-num">2</span>
+            <div>
+              <strong>Scan on Windows</strong>
+              <small>Point this camera window at the QR shown on your phone.</small>
             </div>
-            <div id="standard-list" class="server-list"></div>
           </div>
         </div>
-      </section>
-    </main>
+
+        <div class="scanner-box">
+          <div class="scanner-placeholder">
+            <div class="qr-ghost">
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <p>Start the camera, then hold the Android QR in this frame.</p>
+          </div>
+          <video id="scanner-video" autoplay playsinline muted></video>
+          <div class="scanner-frame"></div>
+          <div id="scanner-status" class="scanner-status">Click start to open the camera and scan the QR from your Android app.</div>
+        </div>
+
+        <div class="cta-row">
+          <button id="start-scan-btn" class="primary-btn">Start QR Scan</button>
+          <button id="stop-scan-btn" class="ghost-btn" disabled>Stop</button>
+        </div>
+
+        <label class="field">
+          <span>Pairing link</span>
+          <input id="pair-link-input" type="text" placeholder="escudo://pair?token=..." />
+        </label>
+        <button id="pair-link-btn" class="ghost-btn full-btn">Use Pairing Link</button>
+      </div>
+
+      <div id="mode-code" class="mode-panel">
+        <label class="field">
+          <span>16-digit account code</span>
+          <input id="code-input" type="text" placeholder="1234-5678-9012-3456" />
+        </label>
+        <div class="cta-row">
+          <button id="code-login-btn" class="primary-btn">Sign In With Code</button>
+          <button id="create-code-btn" class="ghost-btn">Create New Free Account</button>
+        </div>
+        <p id="new-code-output" class="status-line hidden"></p>
+      </div>
+
+      <div id="mode-email" class="mode-panel">
+        <label class="field">
+          <span>Email</span>
+          <input id="email-input" type="email" placeholder="you@example.com" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input id="password-input" type="password" placeholder="Password" />
+        </label>
+        <div class="cta-row">
+          <button id="email-login-btn" class="primary-btn">Sign In</button>
+          <button id="register-btn" class="ghost-btn">Create Account</button>
+        </div>
+      </div>
+
+      <p id="auth-message" class="status-line"></p>
+    </section>
+
+    <section class="surface server-surface">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Routes</p>
+          <h2>Residential first. Standard below.</h2>
+        </div>
+        <button id="refresh-servers-btn" class="ghost-btn">Refresh</button>
+      </div>
+
+      <div class="server-stack">
+        <div class="route-block">
+          <div class="route-block-head">
+            <h3>Residential</h3>
+            <span class="route-note">US, UK, EU</span>
+          </div>
+          <div id="residential-list" class="server-list"></div>
+        </div>
+
+        <div class="route-block">
+          <div class="route-block-head">
+            <h3>Standard</h3>
+            <span class="route-note">Global fleet</span>
+          </div>
+          <div id="standard-list" class="server-list"></div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script src="js/app.js"></script>
