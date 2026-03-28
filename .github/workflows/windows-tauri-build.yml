@@ -1,0 +1,53 @@
+name: windows-tauri-build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/windows-tauri-build.yml'
+      - 'apps/windows/**'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: apps/windows
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/windows/package-lock.json
+
+      - name: Install Rust stable MSVC
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable-msvc
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: 'apps/windows/src-tauri -> target'
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build Windows bundles
+        run: npm run tauri build
+
+      - name: Upload Windows bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: escudo-windows-bundle
+          path: |
+            apps/windows/src-tauri/target/release/bundle/**/*.msi
+            apps/windows/src-tauri/target/release/bundle/**/*setup.exe
+            apps/windows/src-tauri/target/release/bundle/**/*.exe
+          if-no-files-found: error

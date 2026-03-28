@@ -1,0 +1,17 @@
+[Unit]
+Description=Escudo VPN IP Guardian
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/escudo
+ExecStart=/opt/escudo/target/release/escudo-guardian serve
+Environment=DATABASE_URL=postgresql://escudo:escudo_secret@localhost/escudo
+Environment=RUST_LOG=info
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

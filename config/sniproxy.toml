@@ -1,0 +1,22 @@
+[listen]
+addr = "10.0.0.1"
+port = 443
+
+[streaming]
+vpn_bind_ip = "10.0.0.1"
+domains = [
+    "netflix.com",
+    "nflxvideo.net",
+    "nflximg.net",
+    "nflxso.net",
+    "globoplay.globo.com",
+    "globo.com",
+    "disneyplus.com",
+    "disney-plus.net",
+    "hbomax.com",
+    "max.com",
+    "primevideo.com",
+    "amazonvideo.com",
+    "starplus.com",
+    "paramountplus.com",
+]

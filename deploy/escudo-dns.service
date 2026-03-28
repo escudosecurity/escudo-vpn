@@ -1,0 +1,14 @@
+[Unit]
+Description=Escudo DNS Resolver
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/escudo-dns --config /etc/escudo/dns.toml
+Restart=always
+RestartSec=5
+Environment=RUST_LOG=info
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+# Rosenpass quantum-resistant key exchange config
+# Rotates WireGuard PSK every 120 seconds via `wg set peer ... preshared-key`
+# Generate keys: rosenpass gen-keys --secret-key /etc/escudo/rp-secret --public-key /etc/escudo/rp-public
+
+secret_key = "/etc/escudo/rp-secret"
+public_key = "/etc/escudo/rp-public"
+listen = ["0.0.0.0:9999"]
+verbosity = "Verbose"
+
+# Peers are added dynamically via setup-rosenpass.sh
+# Example peer entry:
+# [[peers]]
+# public_key = "/etc/escudo/peers/<peer-id>/rp-public"
+# endpoint = "client-ip:9999"
+# [peers.wireguard]
+# interface = "wg0"
+# peer = "<wireguard-public-key>"

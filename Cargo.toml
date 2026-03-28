@@ -1,0 +1,94 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/escudo-common",
+    "crates/escudo-db",
+    "crates/escudo-gateway",
+    "crates/escudo-dns",
+    "crates/escudo-api",
+    "crates/escudo-admin",
+    "crates/escudo-client",
+    "crates/escudo-sniproxy",
+    "crates/escudo-proxy",
+    "crates/escudo-deploy",
+    "crates/escudo-provisioner",
+    "crates/escudo-ip-manager",
+    "crates/escudo-guardian",
+]
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Web framework
+axum = { version = "0.7", features = ["macros", "ws"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+
+# Database
+sqlx-core = { version = "=0.8.6", default-features = false, features = ["_rt-tokio", "_tls-rustls-ring-webpki", "chrono", "uuid", "migrate"] }
+sqlx-postgres = { version = "=0.8.6", default-features = false, features = ["migrate", "chrono", "uuid"] }
+
+# gRPC
+tonic = "0.12"
+tonic-build = "0.12"
+prost = "0.13"
+
+# Crypto
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+argon2 = "0.5"
+rand = "0.8"
+base64 = "0.22"
+jsonwebtoken = "9"
+
+# DNS
+hickory-server = "0.25"
+hickory-resolver = "0.25"
+hickory-proto = "0.25"
+
+# VPN
+boringtun = "0.7"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# Config
+config = "0.14"
+clap = { version = "4", features = ["derive"] }
+
+# Observability
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+prometheus = "0.14"
+
+# Types
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Encryption
+aes-gcm = "0.10"
+
+# QR code
+qrcode = "0.14"
+image = { version = "0.25", default-features = false, features = ["png"] }
+
+# Async
+futures = "0.3"
+
+# Crypto (billing webhook)
+hmac = "0.12"
+sha2 = "0.10"
+
+# HTTP client
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+
+# Internal crates
+escudo-common = { path = "crates/escudo-common" }
+sqlx = { package = "escudo-db", path = "crates/escudo-db" }
+escudo-proxy = { path = "crates/escudo-proxy" }

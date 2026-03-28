@@ -1,0 +1,18 @@
+# VictoriaMetrics scrape config
+# Place at /etc/victoriametrics/promscrape.yml
+# Start VM with: victoriametrics -promscrape.config=/etc/victoriametrics/promscrape.yml -storageDataPath=/var/lib/victoriametrics
+
+scrape_configs:
+  - job_name: "escudo-gateway"
+    scrape_interval: 15s
+    static_configs:
+      - targets: ["127.0.0.1:8080"]
+        labels:
+          service: "gateway"
+
+  - job_name: "escudo-dns"
+    scrape_interval: 15s
+    static_configs:
+      - targets: ["127.0.0.1:9153"]
+        labels:
+          service: "dns"

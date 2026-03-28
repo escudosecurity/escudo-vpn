@@ -1,0 +1,69 @@
+[defaults]
+ssh_key_ids = []
+tags = ["escudo-vpn"]
+
+[[servers]]
+label = "escudo-fsn1"
+provider = "hetzner"
+region = "fsn1"
+plan = "cx23"
+
+[[servers]]
+label = "escudo-test-nbg"
+provider = "hetzner"
+region = "nbg1"
+plan = "cx23"
+
+[[servers]]
+label = "escudo-hel1"
+provider = "hetzner"
+region = "hel1"
+plan = "cx23"
+
+[[servers]]
+label = "escudo-ash"
+provider = "hetzner"
+region = "ash"
+plan = "cpx11"
+
+[[servers]]
+label = "escudo-hil"
+provider = "hetzner"
+region = "hil"
+plan = "cpx11"
+
+[[servers]]
+label = "escudo-fsn2"
+provider = "hetzner"
+region = "fsn1"
+plan = "cx23"
+
+[[servers]]
+label = "escudo-nbg2"
+provider = "hetzner"
+region = "nbg1"
+plan = "cx23"
+
+[[servers]]
+label = "escudo-hel2"
+provider = "hetzner"
+region = "hel1"
+plan = "cx23"
+
+[[servers]]
+label = "escudo-ash2"
+provider = "hetzner"
+region = "ash"
+plan = "cpx11"
+
+[[servers]]
+label = "escudo-hil2"
+provider = "hetzner"
+region = "hil"
+plan = "cpx11"
+
+[[servers]]
+label = "escudo-sin1"
+provider = "hetzner"
+region = "sin"
+plan = "ccx13"

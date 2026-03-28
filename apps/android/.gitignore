@@ -1,0 +1,6 @@
+.gradle/
+app/build/
+*.keystore
+*.jks
+release-signing.env
+local.properties

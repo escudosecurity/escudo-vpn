@@ -1,0 +1,25 @@
+[package]
+name = "escudo-gateway"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "escudo-gateway"
+path = "src/main.rs"
+
+[dependencies]
+escudo-common = { workspace = true }
+anyhow = { workspace = true }
+axum = { workspace = true }
+clap = { workspace = true }
+reqwest = { workspace = true }
+prometheus = { workspace = true }
+prost = { workspace = true }
+serde = { workspace = true }
+tokio = { workspace = true }
+tonic = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[build-dependencies]
+tonic-build = { workspace = true }

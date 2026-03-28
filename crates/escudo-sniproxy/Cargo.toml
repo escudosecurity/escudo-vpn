@@ -1,0 +1,18 @@
+[package]
+name = "escudo-sniproxy"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "escudo-sniproxy"
+path = "src/main.rs"
+
+[dependencies]
+escudo-common = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+toml = { workspace = true }

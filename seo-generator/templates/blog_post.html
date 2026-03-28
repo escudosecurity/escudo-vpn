@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.meta_title }}{% endblock %}
+{% block meta_description %}{{ post.meta_description }}{% endblock %}
+{% block canonical %}https://escudovpn.com/blog/{{ post.slug }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ post.title }}",
+  "description": "{{ post.meta_description }}",
+  "datePublished": "{{ post.date }}",
+  "dateModified": "{{ post.date }}",
+  "author": {"@type": "Organization", "name": "Escudo VPN", "url": "https://escudovpn.com"},
+  "publisher": {"@type": "Organization", "name": "Escudo VPN", "url": "https://escudovpn.com"}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://escudovpn.com/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://escudovpn.com/blog/"},
+    {"@type": "ListItem", "position": 3, "name": "{{ post.title }}"}
+  ]
+}
+</script>
+{% if post.faq %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {% for q, a in post.faq %}
+    {
+      "@type": "Question",
+      "name": "{{ q }}",
+      "acceptedAnswer": {"@type": "Answer", "text": "{{ a }}"}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .blog-article { max-width: 720px; margin: 0 auto; }
+  .blog-article h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 0.75rem; line-height: 1.15; }
+  .blog-meta { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 2.5rem; }
+  .blog-meta .cat { color: var(--accent); font-weight: 600; }
+
+  .blog-article h2 { font-size: 1.4rem; margin: 2.5rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .blog-article h2:first-of-type { border-top: none; padding-top: 0; }
+  .blog-article p { color: var(--text); line-height: 1.75; margin-bottom: 1rem; font-size: 1rem; max-width: none; }
+  .blog-article a { text-decoration: underline; text-underline-offset: 2px; }
+  .blog-article code { background: var(--bg-raised); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9em; font-family: var(--mono); }
+  .blog-article strong { color: var(--text-bright); }
+
+  .blog-cta {
+    background: var(--bg-card); border: 1px solid var(--accent-dim);
+    border-radius: var(--radius); padding: 2rem; text-align: center;
+    margin: 2.5rem 0;
+  }
+  .blog-cta h3 { margin-bottom: 0.5rem; }
+  .blog-cta p { color: var(--text-dim); margin: 0 auto 1.25rem; }
+
+  .blog-faq { margin: 2.5rem 0; }
+  .blog-faq h2 { margin-bottom: 1.5rem; }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q { font-weight: 600; color: var(--text-bright); margin-bottom: 0.4rem; font-size: 1rem; }
+  .faq-a { color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; }
+
+  .blog-nav { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/">Home</a> <span>&rsaquo;</span>
+  <a href="/blog/">Blog</a> <span>&rsaquo;</span>
+  {{ post.title[:50] }}{% if post.title|length > 50 %}...{% endif %}
+</nav>
+
+<article class="blog-article">
+  <h1>{{ post.title }}</h1>
+  <div class="blog-meta">
+    <span class="cat">{{ post.category }}</span> &middot;
+    {{ post.date }} &middot;
+    Escudo VPN
+  </div>
+
+  {% for section in post.sections %}
+  <h2>{{ section.title }}</h2>
+  {{ section.content | replace('\n\n', '</p><p>') | replace('\n', '<br>') }}
+  {% endfor %}
+
+  <div class="blog-cta">
+    <h3>Proteja-se com Escudo VPN</h3>
+    <p>Criptografia pos-quantica, bloqueio de anuncios e malware, streaming desbloqueado. Instale em 1 minuto.</p>
+    <a href="/#download" class="btn btn-primary">Baixar Escudo VPN — Gratis</a>
+  </div>
+
+  {% if post.faq %}
+  <div class="blog-faq">
+    <h2>Perguntas frequentes</h2>
+    {% for q, a in post.faq %}
+    <div class="faq-item">
+      <div class="faq-q">{{ q }}</div>
+      <div class="faq-a">{{ a }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="blog-nav">
+    <a href="/blog/" class="btn btn-ghost">Todos os artigos</a>
+    <a href="/seguranca-digital/" class="btn btn-ghost">Indice de Seguranca Digital</a>
+    <a href="/teste-de-velocidade" class="btn btn-ghost">Teste de Velocidade</a>
+    <a href="/vazamentos" class="btn btn-ghost">Verificar Vazamentos</a>
+  </div>
+</article>
+
+{% endblock %}

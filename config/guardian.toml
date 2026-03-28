@@ -1,0 +1,22 @@
+database_url = "postgres://escudo:escudo@localhost/escudo"
+check_interval_secs = 1800
+
+[[services]]
+name = "netflix"
+url = "https://www.netflix.com/browse"
+block_indicators = ["unblocker or proxy", "proxy or VPN", "not available in your area"]
+
+[[services]]
+name = "bbc_iplayer"
+url = "https://www.bbc.co.uk/iplayer"
+block_indicators = ["not available in your area", "only available in the UK", "outside the UK"]
+
+[[services]]
+name = "disney_plus"
+url = "https://www.disneyplus.com/"
+block_indicators = ["proxy", "VPN", "not available in your region"]
+
+[[services]]
+name = "globoplay"
+url = "https://globoplay.globo.com/"
+block_indicators = ["não está disponível", "indisponível na sua região"]

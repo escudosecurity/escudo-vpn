@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Escudo VPN</string>
+    <string name="login">Entrar</string>
+    <string name="register">Criar conta</string>
+    <string name="email">E-mail</string>
+    <string name="password">Senha</string>
+    <string name="connect">Conectar</string>
+    <string name="disconnect">Desconectar</string>
+    <string name="connected">Conectado</string>
+    <string name="disconnected">Desconectado</string>
+    <string name="connecting">Conectando…</string>
+    <string name="servers">Servidores</string>
+    <string name="settings">Configurações</string>
+    <string name="home">Início</string>
+    <string name="select_server">Selecione um servidor</string>
+    <string name="server_load">Carga</string>
+    <string name="kill_switch">Kill Switch</string>
+    <string name="account">Conta</string>
+    <string name="logout">Sair</string>
+    <string name="no_server_selected">Nenhum servidor selecionado</string>
+    <string name="vpn_notification_title">Escudo VPN</string>
+    <string name="vpn_notification_connected">Conectado com segurança</string>
+    <string name="vpn_channel_name">VPN Status</string>
+    <string name="vpn_channel_description">Mostra o estado da conexão VPN</string>
+    <string name="upload">Envio</string>
+    <string name="download">Recebido</string>
+    <string name="connection_time">Tempo de conexão</string>
+    <string name="register_prompt">Não tem conta?</string>
+    <string name="login_prompt">Já tem conta?</string>
+</resources>

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Seguranca Digital em {{ state.name }} — Indice por Municipio | Escudo VPN{% endblock %}
+
+{% block meta_description %}Indice de vulnerabilidade digital para {{ municipalities|length }} municipios de {{ state.name }}. Veja velocidade, seguranca e infraestrutura digital por cidade.{% endblock %}
+
+{% block canonical %}https://escudovpn.com/seguranca-digital/{{ state.abbrev }}/{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://escudovpn.com/"},
+    {"@type": "ListItem", "position": 2, "name": "Seguranca Digital", "item": "https://escudovpn.com/seguranca-digital/"},
+    {"@type": "ListItem", "position": 3, "name": "{{ state.name }}"}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/">Home</a> <span>&rsaquo;</span>
+  <a href="/seguranca-digital/">Seguranca Digital</a> <span>&rsaquo;</span>
+  {{ state.name }}
+</nav>
+
+<section class="seo-hero">
+  <h1>Seguranca Digital em {{ state.name }}</h1>
+  <p class="hero-desc">Indice de vulnerabilidade digital para {{ municipalities|length }} municipios de {{ state.name }}. Velocidade media de {{ avg_speed|round(1) }} Mbps e indice medio de vulnerabilidade de {{ avg_score|round(0)|int }}/100.</p>
+</section>
+
+{# ── State Overview Metrics ── #}
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="metric-value">{{ municipalities|length }}</div>
+    <div class="metric-label">Municipios</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">{{ avg_score|round(0)|int }}</div>
+    <div class="metric-label">Vulnerabilidade media</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">{{ avg_speed|round(1) }}</div>
+    <div class="metric-label">Mbps media</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">{{ "{:,}".format(total_pop).replace(",", ".") }}</div>
+    <div class="metric-label">Populacao total</div>
+  </div>
+</div>
+
+{# ── Top Vulnerable ── #}
+{% if top_vulnerable %}
+<section class="seo-section">
+  <h2>Municipios mais vulneraveis de {{ state.name }}</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Municipio</th><th>Indice</th><th>Classificacao</th><th>Download</th><th>Operadoras</th></tr>
+    </thead>
+    <tbody>
+      {% for m in top_vulnerable[:10] %}
+      <tr>
+        <td><a href="/seguranca-digital/{{ m.state_abbrev }}/{{ m.slug }}">{{ m.name }}</a></td>
+        <td><strong style="color: {{ m.vulnerability.color_hex }}">{{ m.vulnerability.total|int }}</strong></td>
+        <td style="color: {{ m.vulnerability.color_hex }}">{{ m.vulnerability.label }}</td>
+        <td>{{ m.speed.avg_download|round(1) }} Mbps</td>
+        <td>{{ m.mobile.providers|length }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+{# ── All Municipalities ── #}
+<section class="seo-section">
+  <h2>Todos os municipios de {{ state.name }}</h2>
+  <div class="muni-grid">
+    {% for m in municipalities %}
+    <a href="/seguranca-digital/{{ m.state_abbrev }}/{{ m.slug }}" class="muni-card" style="text-decoration: none;">
+      <div class="muni-name">{{ m.name }}</div>
+      <div class="muni-score" style="color: {{ m.vulnerability.color_hex }}">{{ m.vulnerability.total|int }}/100 — {{ m.vulnerability.label }}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width: {{ m.vulnerability.total }}%; background: {{ m.vulnerability.color_hex }};"></div></div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+{# ── CTA ── #}
+<div class="cta-box">
+  <h2>Proteja sua conexao em {{ state.name }}</h2>
+  <p>O Escudo VPN criptografa todo o seu trafego com tecnologia pos-quantica. Bloqueio de anuncios, malware e rastreadores incluso.</p>
+  <a href="/#download" class="btn btn-primary">Baixar Escudo VPN — Gratis</a>
+</div>
+
+<div style="margin-top: 2rem;">
+  <a href="/seguranca-digital/" class="btn btn-ghost">Indice Nacional</a>
+</div>
+
+{% endblock %}

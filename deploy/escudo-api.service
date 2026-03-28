@@ -1,0 +1,15 @@
+[Unit]
+Description=Escudo VPN API
+After=network.target postgresql.service escudo-gateway.service
+
+[Service]
+Type=simple
+User=escudo
+ExecStart=/usr/local/bin/escudo-api --config /etc/escudo/api.toml
+Restart=always
+RestartSec=5
+Environment=RUST_LOG=info
+EnvironmentFile=-/etc/escudo/api.env
+
+[Install]
+WantedBy=multi-user.target

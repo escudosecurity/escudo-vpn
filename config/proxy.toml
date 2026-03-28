@@ -1,0 +1,7 @@
+[iproyal]
+socks5_host = "geo.iproyal.com"
+socks5_port = 32325
+
+[pool]
+default_sticky_duration_hours = 168
+max_concurrent_per_shared_ip = 4

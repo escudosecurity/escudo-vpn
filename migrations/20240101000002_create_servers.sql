@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS servers (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL UNIQUE,
+    location VARCHAR(100) NOT NULL,
+    public_ip VARCHAR(45) NOT NULL,
+    public_key VARCHAR(44) NOT NULL,
+    endpoint_port INTEGER NOT NULL DEFAULT 51820,
+    capacity_max INTEGER NOT NULL DEFAULT 10000,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

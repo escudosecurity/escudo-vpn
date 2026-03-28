@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package gateway;
+
+enum Tier {
+    FREE = 0;
+    ESCUDO = 1;
+    PRO = 2;
+    DEDICATED = 3;
+}
+
+enum ProxyTarget {
+    SHARED = 0;
+    DEDICATED_PROXY = 1;
+}
+
+service GatewayService {
+  rpc AddPeer(AddPeerRequest) returns (AddPeerResponse);
+  rpc RemovePeer(RemovePeerRequest) returns (RemovePeerResponse);
+  rpc ListPeers(ListPeersRequest) returns (ListPeersResponse);
+  rpc GetStats(GetStatsRequest) returns (GetStatsResponse);
+  rpc AddMultihopPeer(AddMultihopPeerRequest) returns (AddMultihopPeerResponse);
+  rpc AddExitPeer(AddExitPeerRequest) returns (AddExitPeerResponse);
+  rpc UpdateProxyCredentials(UpdateProxyCredentialsRequest) returns (UpdateProxyCredentialsResponse);
+}
+
+message AddPeerRequest {
+  string public_key = 1;
+  string allowed_ip = 2;
+  string preshared_key = 3;
+  Tier tier = 4;
+}
+
+message AddPeerResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message RemovePeerRequest {
+  string public_key = 1;
+}
+
+message RemovePeerResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ListPeersRequest {}
+
+message ListPeersResponse {
+  repeated PeerInfo peers = 1;
+}
+
+message PeerInfo {
+  string public_key = 1;
+  string allowed_ip = 2;
+  int64 last_handshake = 3;
+  int64 rx_bytes = 4;
+  int64 tx_bytes = 5;
+}
+
+message GetStatsRequest {}
+
+message GetStatsResponse {
+  int32 total_peers = 1;
+  int64 total_rx_bytes = 2;
+  int64 total_tx_bytes = 3;
+  double uptime_seconds = 4;
+}
+
+message AddMultihopPeerRequest {
+  string public_key = 1;
+  string allowed_ip = 2;
+  string preshared_key = 3;
+  string exit_server_endpoint = 4;
+  string exit_server_public_key = 5;
+}
+
+message AddMultihopPeerResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message AddExitPeerRequest {
+  string entry_server_public_key = 1;
+  string allowed_ip = 2;
+}
+
+message AddExitPeerResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message UpdateProxyCredentialsRequest {
+    string socks5_host = 1;
+    uint32 socks5_port = 2;
+    string socks5_username = 3;
+    string socks5_password = 4;
+    ProxyTarget target = 5;
+}
+
+message UpdateProxyCredentialsResponse {
+    bool success = 1;
+    string error = 2;
+}

@@ -1,0 +1,30 @@
+[server]
+addr = "0.0.0.0:3000"
+
+[database]
+url = "CHANGE_ME_VIA_ESCUDO__DATABASE__URL"
+
+[gateway]
+grpc_addr = "http://127.0.0.1:9090"
+
+[jwt]
+secret = "CHANGE_ME_VIA_ESCUDO__JWT__SECRET"
+expiration_hours = 72
+
+[wireguard]
+server_public_key = "57blNh8nx+qjQydq86SN61LVr1N+i5lbte1ntSxC3Tw="
+server_endpoint = "api.escudovpn.com:51820"
+dns = "10.0.0.1"
+allowed_ips = "0.0.0.0/0"
+encryption_key = "CHANGE_ME_VIA_ESCUDO__WIREGUARD__ENCRYPTION_KEY"
+
+[stripe]
+secret_key = "CHANGE_ME_VIA_ESCUDO__STRIPE__SECRET_KEY"
+webhook_secret = "CHANGE_ME_VIA_ESCUDO__STRIPE__WEBHOOK_SECRET"
+price_id = "price_replace_me"
+price_id_annual = "price_replace_me_annual"
+app_url = "https://escudovpn.com"
+
+[testing]
+open_server_access = false
+disable_device_limits = false

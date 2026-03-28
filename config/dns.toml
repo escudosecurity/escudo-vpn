@@ -1,0 +1,28 @@
+[server]
+listen_addr = "10.0.0.1"
+listen_port = 53
+
+[database]
+url = "postgresql://escudo:escudo_secret@localhost/escudo"
+
+[upstream]
+doh_url = "https://1.1.1.1/dns-query"
+
+[blocklist]
+refresh_interval_hours = 24
+
+[[blocklist.sources]]
+name = "hagezi-multi"
+url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/multi.txt"
+
+[[blocklist.sources]]
+name = "urlhaus-malware"
+url = "https://urlhaus.abuse.ch/downloads/hostfile/"
+
+[[blocklist.sources]]
+name = "phishing-filter"
+url = "https://malware-filter.gitlab.io/malware-filter/phishing-filter-domains.txt"
+
+[[blocklist.sources]]
+name = "threat-hostlist"
+url = "https://raw.githubusercontent.com/PeterDaveHello/ip_blacklist/master/block_hostfile.txt"

@@ -1,0 +1,18 @@
+[Unit]
+Description=VictoriaMetrics for Escudo VPN
+After=network.target
+
+[Service]
+Type=simple
+User=victoriametrics
+ExecStart=/usr/local/bin/victoriametrics \
+    -promscrape.config=/etc/victoriametrics/promscrape.yml \
+    -storageDataPath=/var/lib/victoriametrics \
+    -retentionPeriod=30d \
+    -httpListenAddr=127.0.0.1:8428 \
+    -memory.allowedPercent=5
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

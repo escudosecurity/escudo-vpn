@@ -1,0 +1,10 @@
+{
+  "name": "Escudo Launch Prototype",
+  "short_name": "Escudo",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#f4f1ea",
+  "description": "Launch-direction prototype for Escudo VPN, family protection, and supervision flows.",
+  "icons": []
+}

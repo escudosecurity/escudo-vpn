@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f3eb">
+  <title>Escudo Windows</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Escudo Windows Companion</p>
+        <h1>Pair from Android, then connect on Windows</h1>
+      </div>
+      <div class="top-actions">
+        <span id="plan-badge" class="pill">Not signed in</span>
+      </div>
+    </header>
+
+    <section class="surface prereq-surface">
+      <div class="surface-head">
+        <div>
+          <p class="eyebrow">First Run</p>
+          <h2>Windows readiness</h2>
+        </div>
+      </div>
+      <div class="status-grid prereq-grid">
+        <div class="fact-card">
+          <span>Secure network component</span>
+          <strong id="wireguard-value">Checking</strong>
+        </div>
+        <div class="fact-card">
+          <span>App runtime</span>
+          <strong id="webview2-value">Checking</strong>
+        </div>
+      </div>
+      <div class="row-actions">
+        <button id="install-wireguard-btn" class="ghost-btn">Install secure network component</button>
+        <button id="install-webview2-btn" class="ghost-btn">Install app runtime</button>
+        <button id="refresh-prereqs-btn" class="ghost-btn">Refresh</button>
+      </div>
+      <p id="prereq-message" class="status-line"></p>
+    </section>
+
+    <main class="main-grid">
+      <section class="surface login-surface">
+        <div class="surface-head">
+          <div>
+            <p class="eyebrow">Device Pairing</p>
+            <h2>Sign in on Windows</h2>
+          </div>
+        </div>
+
+        <div class="method-switch">
+          <button class="mode-chip active" data-mode="pair">Pair QR / Link</button>
+          <button class="mode-chip" data-mode="code">16-digit Code</button>
+          <button class="mode-chip" data-mode="email">Email</button>
+        </div>
+
+        <div id="mode-pair" class="mode-panel active">
+          <p class="helper">On your Android phone: <strong>Conta</strong> -> <strong>Gerar QR e link</strong>. Then scan it here or paste the pairing link.</p>
+          <div class="scanner-box">
+            <video id="scanner-video" autoplay playsinline muted></video>
+            <div class="scanner-frame"></div>
+            <div id="scanner-status" class="scanner-status">Click start to open the camera and scan the QR.</div>
+          </div>
+          <div class="row-actions">
+            <button id="start-scan-btn" class="primary-btn">Start QR Scan</button>
+            <button id="stop-scan-btn" class="ghost-btn" disabled>Stop</button>
+          </div>
+          <label class="field">
+            <span>Pairing link</span>
+            <input id="pair-link-input" type="text" placeholder="escudo://pair?token=..." />
+          </label>
+          <button id="pair-link-btn" class="ghost-btn full-btn">Use Pairing Link</button>
+        </div>
+
+        <div id="mode-code" class="mode-panel">
+          <label class="field">
+            <span>16-digit account code</span>
+            <input id="code-input" type="text" placeholder="1234-5678-9012-3456" />
+          </label>
+          <div class="row-actions">
+            <button id="code-login-btn" class="primary-btn">Sign In With Code</button>
+            <button id="create-code-btn" class="ghost-btn">Create New Free Account</button>
+          </div>
+          <p id="new-code-output" class="helper hidden"></p>
+        </div>
+
+        <div id="mode-email" class="mode-panel">
+          <label class="field">
+            <span>Email</span>
+            <input id="email-input" type="email" placeholder="you@example.com" />
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input id="password-input" type="password" placeholder="Password" />
+          </label>
+          <div class="row-actions">
+            <button id="email-login-btn" class="primary-btn">Sign In</button>
+            <button id="register-btn" class="ghost-btn">Create Account</button>
+          </div>
+        </div>
+
+        <p id="auth-message" class="status-line"></p>
+      </section>
+
+      <section class="surface status-surface">
+        <div class="surface-head">
+          <div>
+            <p class="eyebrow">Device Status</p>
+            <h2>Windows connection</h2>
+          </div>
+        </div>
+
+        <div class="status-grid">
+          <div class="fact-card">
+            <span>Login</span>
+            <strong id="logged-in-value">Offline</strong>
+          </div>
+          <div class="fact-card">
+            <span>VPN</span>
+            <strong id="vpn-state-value">Disconnected</strong>
+          </div>
+          <div class="fact-card">
+            <span>Selected route</span>
+            <strong id="selected-route-value">None</strong>
+          </div>
+        </div>
+
+        <div class="route-panel">
+          <div>
+            <p class="eyebrow">Current route</p>
+            <h3 id="route-title">Choose a server below</h3>
+            <p id="route-subtitle">Residential and standard routes are shown exactly as the backend exposes them.</p>
+          </div>
+          <div class="row-actions">
+            <button id="connect-btn" class="primary-btn" disabled>Connect</button>
+            <button id="disconnect-btn" class="ghost-btn" disabled>Disconnect</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="surface server-surface">
+      <div class="surface-head">
+        <div>
+          <p class="eyebrow">Server Inventory</p>
+          <h2>Residential first, then standard</h2>
+        </div>
+        <button id="refresh-servers-btn" class="ghost-btn">Refresh</button>
+      </div>
+
+      <div class="server-columns">
+        <div>
+          <h3 class="column-title">Residential</h3>
+          <div id="residential-list" class="server-list"></div>
+        </div>
+        <div>
+          <h3 class="column-title">Standard</h3>
+          <div id="standard-list" class="server-list"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

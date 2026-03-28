@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Seguranca Digital em {{ m.name }}, {{ m.state_abbrev|upper }} — Indice {{ m.vulnerability.total|int }}/100 | Escudo VPN{% endblock %}
+
+{% block meta_description %}Indice de vulnerabilidade digital em {{ m.name }}/{{ m.state_abbrev|upper }}: {{ m.vulnerability.total|int }}/100. {{ m.speed.avg_download|round(1) }} Mbps, {{ pct_4g5g }}% 4G/5G, {{ m.mobile.providers|length }} operadoras. Proteja-se com Escudo VPN.{% endblock %}
+
+{% block canonical %}https://escudovpn.com/seguranca-digital/{{ m.state_abbrev }}/{{ m.slug }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Seguranca Digital em {{ m.name }}, {{ m.state_abbrev|upper }}",
+  "description": "Indice de vulnerabilidade digital: {{ m.vulnerability.total|int }}/100. Analise completa de velocidade, seguranca e infraestrutura digital.",
+  "author": {
+    "@type": "Organization",
+    "name": "Escudo VPN",
+    "url": "https://escudovpn.com"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Escudo VPN",
+    "url": "https://escudovpn.com"
+  },
+  "datePublished": "{{ generated_date }}",
+  "dateModified": "{{ generated_date }}"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://escudovpn.com/"},
+    {"@type": "ListItem", "position": 2, "name": "Seguranca Digital", "item": "https://escudovpn.com/seguranca-digital/"},
+    {"@type": "ListItem", "position": 3, "name": "{{ m.state_name }}", "item": "https://escudovpn.com/seguranca-digital/{{ m.state_abbrev }}/"},
+    {"@type": "ListItem", "position": 4, "name": "{{ m.name }}"}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+{# ── Breadcrumb ── #}
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/">Home</a> <span>&rsaquo;</span>
+  <a href="/seguranca-digital/">Seguranca Digital</a> <span>&rsaquo;</span>
+  <a href="/seguranca-digital/{{ m.state_abbrev }}/">{{ m.state_name }}</a> <span>&rsaquo;</span>
+  {{ m.name }}
+</nav>
+
+{# ── Hero ── #}
+<section class="seo-hero">
+  <span class="score-badge" style="background: {{ m.vulnerability.color_hex }}22; border: 1px solid {{ m.vulnerability.color_hex }}55; color: {{ m.vulnerability.color_hex }};">
+    {{ m.vulnerability.total|int }}/100 &mdash; {{ m.vulnerability.label }}
+  </span>
+  <h1>Seguranca Digital em {{ m.name }}, {{ m.state_abbrev|upper }}</h1>
+  <p class="hero-desc">{{ hero_text }}</p>
+  <a href="/#download" class="btn btn-primary">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3L4 7v5c0 5.6 3.4 10.5 8 12 4.6-1.5 8-6.4 8-12V7l-8-4z"/></svg>
+    Proteja-se com Escudo VPN
+  </a>
+</section>
+
+{# ── Score Dashboard ── #}
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="metric-value" style="color: {{ m.vulnerability.color_hex }}">{{ m.vulnerability.total|int }}</div>
+    <div class="metric-label">Indice de Vulnerabilidade</div>
+    <div class="progress-bar"><div class="progress-fill" style="width: {{ m.vulnerability.total }}%; background: {{ m.vulnerability.color_hex }};"></div></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">{{ m.speed.avg_download|round(1) }}</div>
+    <div class="metric-label">Mbps download medio</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">{{ m.safety.risk_score|round(0)|int }}</div>
+    <div class="metric-label">Score de seguranca</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value">{{ m.mobile.providers|length }}</div>
+    <div class="metric-label">Operadoras moveis</div>
+  </div>
+</div>
+
+{# ── Internet Speed ── #}
+<section class="seo-section" id="velocidade">
+  <h2>Velocidade da Internet em {{ m.name }}</h2>
+  {% if m.speed.avg_download > 0 %}
+  <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Dados de speedtest para {{ m.name }}, {{ m.state_abbrev|upper }}. Velocidade media de {{ m.speed.avg_download|round(1) }} Mbps para download e {{ m.speed.avg_upload|round(1) }} Mbps para upload.</p>
+  {% else %}
+  <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Dados de speedtest ainda nao disponiveis para {{ m.name }}. <a href="/teste-de-velocidade">Faca um teste de velocidade</a> para medir sua conexao.</p>
+  {% endif %}
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Metrica</th><th>{{ m.name }}</th><th>Percentil 10</th><th>Mediana</th><th>Percentil 90</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Download (Mbps)</td>
+        <td><strong>{{ m.speed.avg_download|round(1) }}</strong></td>
+        <td>{{ m.speed.p10_download|round(1) }}</td>
+        <td>{{ m.speed.p50_download|round(1) }}</td>
+        <td>{{ m.speed.p90_download|round(1) }}</td>
+      </tr>
+      <tr>
+        <td>Upload (Mbps)</td>
+        <td><strong>{{ m.speed.avg_upload|round(1) }}</strong></td>
+        <td>{{ m.speed.p10_upload|round(1) }}</td>
+        <td>{{ m.speed.p50_upload|round(1) }}</td>
+        <td>{{ m.speed.p90_upload|round(1) }}</td>
+      </tr>
+      <tr>
+        <td>Latencia (ms)</td>
+        <td colspan="4"><strong>{{ m.speed.avg_latency|round(1) }} ms</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  {% if m.speed.avg_download < 25 %}
+  <p style="color: var(--text-dim); margin-top: 1rem;">Com velocidades abaixo de 25 Mbps, conexoes em {{ m.name }} sao mais vulneraveis a ataques man-in-the-middle durante carregamentos lentos. Uma VPN protege seus dados mesmo em conexoes lentas.</p>
+  {% endif %}
+</section>
+
+{# ── Mobile Network Security ── #}
+<section class="seo-section" id="rede-movel">
+  <h2>Seguranca da Rede Movel em {{ m.name }}</h2>
+
+  {% if m.mobile.tech_subscribers %}
+  <div class="bar-chart">
+    {% for tech in ["5G", "4G", "3G", "2G"] %}
+    {% set subs = m.mobile.tech_subscribers.get(tech, 0) %}
+    {% if subs > 0 %}
+    {% set pct = (subs / m.mobile.total_subscribers * 100)|round(1) if m.mobile.total_subscribers > 0 else 0 %}
+    <div class="bar-row">
+      <span class="bar-label">{{ tech }}</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: {{ pct }}%; background: {% if tech == '5G' %}var(--accent){% elif tech == '4G' %}var(--green){% elif tech == '3G' %}var(--red){% else %}#8b949e{% endif %};">{{ pct }}%</div>
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if m.mobile.providers %}
+  <h3>Operadoras em {{ m.name }}</h3>
+  <p style="color: var(--text-dim);">{{ m.mobile.providers|join(", ") }}</p>
+  {% endif %}
+
+  {% if m.mobile.has_5g %}
+  <p style="margin-top: 1rem; color: var(--green);">{{ m.name }} ja possui cobertura 5G, oferecendo conexoes mais seguras e rapidas.</p>
+  {% else %}
+  <p style="margin-top: 1rem; color: var(--text-dim);">{{ m.name }} ainda nao possui cobertura 5G. Redes 3G e 2G possuem vulnerabilidades conhecidas que podem ser exploradas para interceptacao de dados. O Escudo VPN criptografa todo o trafego independente da tecnologia de rede.</p>
+  {% endif %}
+</section>
+
+{# ── Safety Context ── #}
+{% if m.safety.risk_score > 0 or m.safety.homicide_rate > 0 %}
+<section class="seo-section" id="seguranca">
+  <h2>Contexto de Seguranca em {{ m.name }}</h2>
+
+  <div class="risk-factors">
+    {% if m.safety.risk_score > 0 %}
+    <div class="risk-factor">
+      <div class="rf-label">Indice de risco</div>
+      <div class="rf-value">{{ m.safety.risk_score|round(0)|int }}/100</div>
+      <div class="rf-desc">baseado em indicadores de criminalidade</div>
+    </div>
+    {% endif %}
+    {% if m.safety.homicide_rate > 0 %}
+    <div class="risk-factor">
+      <div class="rf-label">Taxa de homicidio</div>
+      <div class="rf-value">{{ m.safety.homicide_rate|round(1) }}</div>
+      <div class="rf-desc">por 100 mil habitantes</div>
+    </div>
+    {% endif %}
+    {% if m.safety.theft_rate > 0 %}
+    <div class="risk-factor">
+      <div class="rf-label">Taxa de furto/roubo</div>
+      <div class="rf-value">{{ m.safety.theft_rate|round(0)|int }}</div>
+      <div class="rf-desc">por 100 mil habitantes</div>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if m.safety.risk_score > 50 %}
+  <p style="color: var(--text-dim);">Com indice de risco {{ m.safety.risk_score|round(0)|int }}/100, {{ m.name }} apresenta indicadores de criminalidade elevados. Roubo de celulares expoe senhas, apps bancarios e credenciais. O Escudo VPN criptografa seus dados em transito, reduzindo a exposicao em caso de interceptacao.</p>
+  {% endif %}
+</section>
+{% endif %}
+
+{# ── Digital Infrastructure ── #}
+<section class="seo-section" id="infraestrutura">
+  <h2>Infraestrutura Digital em {{ m.name }}</h2>
+
+  <div class="risk-factors">
+    <div class="risk-factor">
+      <div class="rf-label">Escolas com internet</div>
+      <div class="rf-value">{{ m.infrastructure.school_internet_pct|round(1) }}%</div>
+      <div class="rf-desc">{{ m.infrastructure.schools_with_internet }} de {{ m.infrastructure.total_schools }} escolas</div>
+    </div>
+    <div class="risk-factor">
+      <div class="rf-label">Cobertura de agua</div>
+      <div class="rf-value">{{ m.infrastructure.water_coverage_pct|round(1) }}%</div>
+      <div class="rf-desc">da populacao atendida</div>
+    </div>
+  </div>
+
+  {% if m.infrastructure.school_internet_pct < 60 %}
+  <p style="color: var(--text-dim); margin-top: 1rem;">Com apenas {{ m.infrastructure.school_internet_pct|round(1) }}% das escolas conectadas, {{ m.name }} apresenta defasagem digital que impacta a seguranca online de seus cidadaos.</p>
+  {% endif %}
+</section>
+
+{# ── How Escudo Protects You ── #}
+<div class="cta-box">
+  <h2>Como o Escudo protege voce em {{ m.name }}</h2>
+  <p>{{ cta_text }}</p>
+
+  <div class="steps-compact">
+    <div class="step-compact">
+      <h3>Baixe o Escudo</h3>
+      <p>App leve para Android e Windows. Instale em 1 minuto.</p>
+    </div>
+    <div class="step-compact">
+      <h3>Conecte com um toque</h3>
+      <p>Criptografia pos-quantica ativada automaticamente.</p>
+    </div>
+    <div class="step-compact">
+      <h3>Navegue protegido</h3>
+      <p>Seus dados criptografados, anuncios bloqueados, privacidade garantida.</p>
+    </div>
+  </div>
+
+  <a href="/#download" class="btn btn-primary">Baixar Escudo VPN — Gratis</a>
+</div>
+
+{# ── City Profile ── #}
+<section class="seo-section" id="perfil">
+  <h2>Perfil de {{ m.name }}, {{ m.state_abbrev|upper }}</h2>
+
+  <div class="profile-grid">
+    <div class="profile-item">
+      <div class="pi-value">{{ "{:,}".format(m.population).replace(",", ".") }}</div>
+      <div class="pi-label">Habitantes</div>
+    </div>
+    <div class="profile-item">
+      <div class="pi-value">{{ "{:,}".format(m.broadband.total_subscribers).replace(",", ".") }}</div>
+      <div class="pi-label">Assinantes de internet</div>
+    </div>
+    <div class="profile-item">
+      <div class="pi-value">{{ m.broadband_penetration|round(1) }}%</div>
+      <div class="pi-label">Penetracao de banda larga</div>
+    </div>
+  </div>
+
+  <p style="color: var(--text-dim);">{{ m.name }} tem {{ "{:,}".format(m.population).replace(",", ".") }} habitantes e {{ "{:,}".format(m.broadband.total_subscribers).replace(",", ".") }} assinantes de internet, com {{ m.broadband_penetration|round(1) }}% de penetracao de banda larga.</p>
+</section>
+
+{# ── Internal Links ── #}
+<section class="seo-section" id="cidades">
+  <h2>Cidades vizinhas</h2>
+  <p style="color: var(--text-dim); margin-bottom: 0.5rem;">Veja o indice de seguranca digital das cidades proximas a {{ m.name }}:</p>
+  <div class="neighbor-grid">
+    {% for n in m.neighbors %}
+    <a href="/seguranca-digital/{{ n.state_abbrev }}/{{ n.slug }}" class="neighbor-link">{{ n.name }}</a>
+    {% endfor %}
+  </div>
+
+  <div style="margin-top: 2rem;">
+    <a href="/seguranca-digital/{{ m.state_abbrev }}/" class="btn btn-ghost">Ver todas as cidades de {{ m.state_name }}</a>
+    <a href="/seguranca-digital/" class="btn btn-ghost" style="margin-left: 0.5rem;">Indice Nacional</a>
+  </div>
+</section>
+
+{% endblock %}

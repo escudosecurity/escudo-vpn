@@ -1,0 +1,26 @@
+[server]
+grpc_addr = "127.0.0.1:9090"
+health_addr = "127.0.0.1:8080"
+
+[wireguard]
+interface = "wg0"
+subnet = "10.0.0.0/16"
+ip_start = "10.0.0.2"
+ip_end = "10.0.255.254"
+wg1_interface = "wg1"
+wg2_interface = "wg2"
+
+[stats]
+collection_interval_secs = 30
+
+[proxy]
+enabled = true
+env_dir = "/etc/escudo"
+shared_service = "escudo-tun2socks-shared.service"
+dedicated_service = "escudo-tun2socks-dedicated.service"
+
+[proxy.poll]
+central_api_url = "https://api.escudovpn.com"
+server_label = "replace-me"
+deploy_secret = "CHANGE_ME_VIA_ESCUDO__PROXY__POLL__DEPLOY_SECRET"
+poll_interval_secs = 60

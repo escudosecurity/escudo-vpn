@@ -1,0 +1,26 @@
+[package]
+name = "escudo-vpn"
+version = "1.0.0"
+description = "Escudo VPN - Brazilian VPN Client"
+authors = ["PulsoVPN"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
+dirs = "5"
+hostname = "0.4"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+
+[workspace]

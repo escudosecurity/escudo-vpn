@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escudo VPN Ops Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #09131f;
+            --panel: rgba(13, 24, 38, 0.92);
+            --panel-2: rgba(18, 33, 52, 0.92);
+            --line: #20344b;
+            --text: #ecf3fa;
+            --muted: #8fa5bc;
+            --green: #49d391;
+            --blue: #52b9ff;
+            --amber: #ffbf47;
+            --red: #ff6d6d;
+        }
+        body {
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(47, 120, 194, 0.30), transparent 28%),
+                radial-gradient(circle at top right, rgba(73, 211, 145, 0.12), transparent 24%),
+                linear-gradient(180deg, #0b1828 0%, #07101a 100%);
+            min-height: 100vh;
+        }
+        .shell { max-width: 1560px; margin: 0 auto; padding: 0 20px 28px; }
+        .header {
+            position: sticky; top: 0; z-index: 10;
+            backdrop-filter: blur(12px);
+            background: rgba(7, 16, 26, 0.84);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .header-inner {
+            max-width: 1560px; margin: 0 auto; padding: 18px 20px;
+            display: flex; justify-content: space-between; align-items: center; gap: 16px;
+        }
+        .eyebrow { color: var(--blue); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; }
+        h1 { font-size: 28px; font-weight: 700; margin-top: 4px; }
+        .header-meta { text-align: right; font-size: 14px; color: var(--muted); }
+        .status-line { color: var(--text); }
+        .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 26px 0 12px; }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0 8px;
+        }
+        .tab-btn {
+            border: 1px solid var(--line);
+            background: rgba(8, 16, 26, 0.75);
+            color: var(--muted);
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            color: var(--text);
+            background: linear-gradient(90deg, rgba(82, 185, 255, 0.18), rgba(73, 211, 145, 0.18));
+            border-color: rgba(82, 185, 255, 0.45);
+        }
+        .hero-grid, .metric-grid, .detail-grid, .telemetry-grid {
+            display: grid;
+            gap: 14px;
+        }
+        .hero-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+        .metric-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+        .detail-grid { grid-template-columns: 1.2fr 0.9fr 0.9fr; align-items: start; }
+        .telemetry-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .panel {
+            background: linear-gradient(180deg, var(--panel-2), var(--panel));
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 18px 48px rgba(0,0,0,0.28);
+            overflow: hidden;
+        }
+        .panel-pad { padding: 18px; }
+        .panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 10px; }
+        .panel h4 { font-size: 15px; color: var(--text); margin-bottom: 10px; }
+        .big { font-size: 34px; font-weight: 700; line-height: 1.05; }
+        .big.green { color: var(--green); }
+        .big.blue { color: var(--blue); }
+        .big.amber { color: var(--amber); }
+        .sub { font-size: 13px; color: var(--muted); margin-top: 8px; }
+        .mini-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .mini-stat {
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            background: rgba(5, 12, 19, 0.28);
+        }
+        .mini-stat .label { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+        .mini-stat .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+        .chart-box { height: 280px; }
+        .list { display: grid; gap: 10px; }
+        .list-row {
+            display: grid; grid-template-columns: minmax(0, 1fr) auto auto;
+            align-items: center; gap: 10px;
+        }
+        .list-row .name { font-size: 14px; }
+        .list-row .count { color: var(--text); font-weight: 700; font-size: 14px; }
+        .bar {
+            width: 100%; height: 10px; border-radius: 999px;
+            background: rgba(255,255,255,0.06); overflow: hidden;
+        }
+        .bar > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--blue), var(--green)); }
+        .flag-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .flag-card {
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            background: rgba(5, 12, 19, 0.30);
+            padding: 14px;
+        }
+        .flag-card .flag-value { font-size: 26px; font-weight: 700; margin-top: 6px; }
+        .alert-list { display: grid; gap: 12px; }
+        .alert-card {
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            background: rgba(5, 12, 19, 0.32);
+            padding: 14px;
+        }
+        .alert-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .alert-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .sev-critical { color: var(--red); }
+        .sev-warning { color: var(--amber); }
+        .sev-info { color: var(--blue); }
+        .coverage {
+            padding: 16px;
+            min-height: 120px;
+        }
+        .coverage .pct { font-size: 30px; font-weight: 700; }
+        .coverage .raw { margin-top: 8px; color: var(--muted); font-size: 13px; }
+        .controls {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;
+        }
+        .controls input, .controls select {
+            background: rgba(5, 12, 19, 0.55);
+            border: 1px solid var(--line);
+            color: var(--text);
+            border-radius: 12px;
+            padding: 10px 12px;
+            min-width: 180px;
+        }
+        .controls button, .action-btn {
+            background: linear-gradient(90deg, rgba(82, 185, 255, 0.22), rgba(73, 211, 145, 0.22));
+            border: 1px solid rgba(82, 185, 255, 0.35);
+            color: var(--text);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .controls label, .stack label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .stack { display: grid; gap: 12px; }
+        .stack input, .stack select, .stack textarea {
+            width: 100%;
+            background: rgba(5, 12, 19, 0.55);
+            border: 1px solid var(--line);
+            color: var(--text);
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+        .stack textarea { min-height: 88px; resize: vertical; }
+        .launch-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 14px; }
+        .log-table { min-width: 860px; }
+        .table-wrap { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1180px; }
+        th, td { padding: 14px 12px; text-align: left; border-top: 1px solid rgba(255,255,255,0.05); vertical-align: top; }
+        th { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+        td { font-size: 14px; }
+        .mini { color: var(--muted); font-size: 12px; margin-top: 4px; }
+        .badge {
+            display: inline-flex; align-items: center; border-radius: 999px;
+            padding: 5px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .healthy { background: rgba(73, 211, 145, 0.12); color: var(--green); }
+        .warm { background: rgba(82, 185, 255, 0.12); color: var(--blue); }
+        .degraded { background: rgba(255, 191, 71, 0.12); color: var(--amber); }
+        .blocked { background: rgba(255, 109, 109, 0.12); color: var(--red); }
+        .other { background: rgba(255,255,255,0.08); color: var(--muted); }
+        .pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 10px; border-radius: 999px;
+            background: rgba(255,255,255,0.06); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .empty { padding: 18px; color: var(--muted); }
+        @media (max-width: 1180px) {
+            .detail-grid, .launch-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 720px) {
+            .shell { padding: 0 12px 18px; }
+            .header-inner { padding: 14px 12px; align-items: flex-start; flex-direction: column; }
+            .mini-grid, .flag-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body x-data="dashboard()" x-init="init()">
+    <div class="header">
+        <div class="header-inner">
+            <div>
+                <div class="eyebrow">Escudo Ops Control Plane</div>
+                <h1>Launch Dashboard</h1>
+            </div>
+            <div class="header-meta">
+                <div class="status-line" x-text="statusText"></div>
+                <div>Last update <span x-text="lastUpdate"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="shell">
+        <div class="section-title">Fleet Headline</div>
+        <div class="hero-grid">
+            <div class="panel panel-pad">
+                <h3>Total Nodes</h3>
+                <div class="big green" x-text="formatInteger(overview.total_nodes)"></div>
+                <div class="sub"><span x-text="formatInteger(overview.healthy_nodes)"></span> healthy and routing</div>
+            </div>
+            <div class="panel panel-pad">
+                <h3>Total Users</h3>
+                <div class="big blue" x-text="formatInteger(snapshot.total_users)"></div>
+                <div class="sub"><span x-text="formatInteger(snapshot.active_users)"></span> active accounts</div>
+            </div>
+            <div class="panel panel-pad">
+                <h3>Total Devices</h3>
+                <div class="big" x-text="formatInteger(snapshot.total_devices)"></div>
+                <div class="sub"><span x-text="formatInteger(snapshot.active_devices)"></span> active devices</div>
+            </div>
+            <div class="panel panel-pad">
+                <h3>Active Sessions</h3>
+                <div class="big amber" x-text="formatInteger(snapshot.active_device_sessions)"></div>
+                <div class="sub">device-side live sessions</div>
+            </div>
+            <div class="panel panel-pad">
+                <h3>Paid Users</h3>
+                <div class="big" x-text="formatInteger(snapshot.paid_users)"></div>
+                <div class="sub"><span x-text="planShareText()"></span> of total base</div>
+            </div>
+            <div class="panel panel-pad">
+                <h3>Avg Health Score</h3>
+                <div class="big green" x-text="formatNumber(overview.avg_health_score, 1)"></div>
+                <div class="sub"><span x-text="formatInteger(overview.total_assigned_user_cap)"></span> assigned-user cap fleetwide</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn" :class="{ active: activeTab === 'servers' }" @click="activeTab = 'servers'">Server Ops</button>
+            <button class="tab-btn" :class="{ active: activeTab === 'users' }" @click="activeTab = 'users'">Users</button>
+            <button class="tab-btn" :class="{ active: activeTab === 'alerts' }" @click="activeTab = 'alerts'">Alerts</button>
+            <button class="tab-btn" :class="{ active: activeTab === 'telemetry' }" @click="activeTab = 'telemetry'">Telemetry</button>
+            <button class="tab-btn" :class="{ active: activeTab === 'launch' }" @click="activeTab = 'launch'">Launch</button>
+            <button class="tab-btn" :class="{ active: activeTab === 'family' }" @click="activeTab = 'family'">Family</button>
+        </div>
+
+        <div x-show="activeTab === 'servers'">
+            <div class="section-title">Server Ops</div>
+            <div class="metric-grid">
+                <div class="panel panel-pad">
+                    <h3>Node State Distribution</h3>
+                    <div class="chart-box"><canvas id="stateChart"></canvas></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Node Countries</h3>
+                    <div class="list" x-html="renderList(snapshot.node_country_mix, overview.total_nodes)"></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Routing Flags</h3>
+                    <div class="flag-grid">
+                        <div class="flag-card">
+                            <div class="label">Dedicated Required</div>
+                            <div class="flag-value" x-text="formatInteger(snapshot.dedicated_devices)"></div>
+                        </div>
+                        <div class="flag-card">
+                            <div class="label">Sensitive Route</div>
+                            <div class="flag-value" x-text="formatInteger(snapshot.sensitive_route_devices)"></div>
+                        </div>
+                        <div class="flag-card">
+                            <div class="label">Rx Lifetime</div>
+                            <div class="flag-value" x-text="formatBytes(snapshot.total_rx_bytes)"></div>
+                        </div>
+                        <div class="flag-card">
+                            <div class="label">Tx Lifetime</div>
+                            <div class="flag-value" x-text="formatBytes(snapshot.total_tx_bytes)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Fleet Table</div>
+            <div class="panel panel-pad">
+                <div class="controls">
+                    <input type="search" x-model="search" placeholder="Search node, IP, provider, country">
+                    <select x-model="lifecycleFilter">
+                        <option value="">All states</option>
+                        <option value="healthy">Healthy</option>
+                        <option value="warm">Warm</option>
+                        <option value="degraded">Degraded</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                    <select x-model="serviceFilter">
+                        <option value="">All classes</option>
+                        <option value="Free">Free</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Power">Power</option>
+                    </select>
+                </div>
+                <div class="table-wrap" x-show="filteredNodes.length > 0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Node</th>
+                                <th>State</th>
+                                <th>Health</th>
+                                <th>Assigned</th>
+                                <th>Sessions</th>
+                                <th>CPU</th>
+                                <th>RAM</th>
+                                <th>NIC In</th>
+                                <th>NIC Out</th>
+                                <th>Connect</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="node in filteredNodes" :key="node.id">
+                                <tr>
+                                    <td>
+                                        <div x-text="node.name"></div>
+                                        <div class="mini">
+                                            <span x-text="node.location"></span>
+                                            <span> • </span>
+                                            <span x-text="node.public_ip"></span>
+                                        </div>
+                                        <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+                                            <span class="pill" x-text="node.service_class"></span>
+                                            <span class="pill" x-show="node.provider" x-text="node.provider || ''"></span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge" :class="stateBadgeClass(node.lifecycle_state)" x-text="node.lifecycle_state"></span></td>
+                                    <td>
+                                        <div x-text="formatInteger(node.health_score)"></div>
+                                        <div class="mini">weight <span x-text="formatNumber(node.routing_weight, 2)"></span></div>
+                                    </td>
+                                    <td>
+                                        <div><span x-text="formatInteger(node.assigned_users)"></span> / <span x-text="formatInteger(node.assigned_user_cap)"></span></div>
+                                        <div class="mini">soft <span x-text="formatInteger(node.active_session_soft_cap)"></span> hard <span x-text="formatInteger(node.active_session_hard_cap)"></span></div>
+                                    </td>
+                                    <td x-text="formatInteger(node.active_sessions)"></td>
+                                    <td x-text="formatPercent(node.cpu_pct)"></td>
+                                    <td x-text="formatPercent(node.ram_pct)"></td>
+                                    <td x-text="formatMbps(node.nic_in_mbps)"></td>
+                                    <td x-text="formatMbps(node.nic_out_mbps)"></td>
+                                    <td>
+                                        <div x-text="formatPercent(node.connect_success_pct)"></div>
+                                        <div class="mini"><span x-text="formatInteger(node.median_connect_ms)"></span> ms median</div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty" x-show="filteredNodes.length === 0">No nodes match the current filters.</div>
+            </div>
+        </div>
+
+        <div x-show="activeTab === 'users'">
+            <div class="section-title">Users</div>
+            <div class="metric-grid">
+                <div class="panel panel-pad">
+                    <h3>Plan Mix</h3>
+                    <div class="chart-box"><canvas id="planChart"></canvas></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Users By Country</h3>
+                    <div class="list" x-html="renderList(snapshot.user_country_mix, snapshot.total_users)"></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Device Platforms</h3>
+                    <div class="list" x-html="renderList(snapshot.device_platform_mix, snapshot.total_devices)"></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Usage Buckets</h3>
+                    <div class="list" x-html="renderList(snapshot.usage_bucket_mix, snapshot.total_devices)"></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Preferred Class</h3>
+                    <div class="list" x-html="renderList(snapshot.preferred_class_mix, snapshot.total_devices)"></div>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="activeTab === 'alerts'">
+            <div class="section-title">Alerts And Abuse</div>
+            <div class="metric-grid">
+                <div class="panel panel-pad">
+                    <h3>Abuse Summary</h3>
+                    <div class="mini-grid">
+                        <div class="mini-stat">
+                            <div class="label">Flagged Users</div>
+                            <div class="value" x-text="formatInteger(snapshot.flagged_users)"></div>
+                        </div>
+                        <div class="mini-stat">
+                            <div class="label">High Risk</div>
+                            <div class="value" x-text="formatInteger(snapshot.high_risk_users)"></div>
+                        </div>
+                        <div class="mini-stat">
+                            <div class="label">Avg Abuse</div>
+                            <div class="value" x-text="formatNumber(snapshot.avg_abuse_score, 1)"></div>
+                        </div>
+                        <div class="mini-stat">
+                            <div class="label">Tracked Bucket</div>
+                            <div class="value" x-text="topLabel(snapshot.abuse_bucket_mix)"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Abuse Buckets</h3>
+                    <div class="list" x-html="renderList(snapshot.abuse_bucket_mix, snapshot.total_users)"></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Live Alerts</h3>
+                    <div class="alert-list" x-html="renderAlerts(alerts)"></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Routing Flags</h3>
+                    <div class="flag-grid">
+                        <div class="flag-card">
+                            <div class="label">Dedicated Required</div>
+                            <div class="flag-value" x-text="formatInteger(snapshot.dedicated_devices)"></div>
+                        </div>
+                        <div class="flag-card">
+                            <div class="label">Sensitive Route</div>
+                            <div class="flag-value" x-text="formatInteger(snapshot.sensitive_route_devices)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="activeTab === 'telemetry'">
+            <div class="section-title">Telemetry</div>
+            <div class="telemetry-grid">
+                <div class="panel coverage">
+                    <h3>User Signup Country</h3>
+                    <div class="pct" x-text="coveragePct(snapshot.telemetry_coverage.signup_country_users, snapshot.total_users)"></div>
+                    <div class="raw"><span x-text="formatInteger(snapshot.telemetry_coverage.signup_country_users)"></span> of <span x-text="formatInteger(snapshot.total_users)"></span> users populated</div>
+                </div>
+                <div class="panel coverage">
+                    <h3>User Login Country</h3>
+                    <div class="pct" x-text="coveragePct(snapshot.telemetry_coverage.latest_login_country_users, snapshot.total_users)"></div>
+                    <div class="raw"><span x-text="formatInteger(snapshot.telemetry_coverage.latest_login_country_users)"></span> of <span x-text="formatInteger(snapshot.total_users)"></span> users populated</div>
+                </div>
+                <div class="panel coverage">
+                    <h3>Device Platform</h3>
+                    <div class="pct" x-text="coveragePct(snapshot.telemetry_coverage.device_platforms, snapshot.total_devices)"></div>
+                    <div class="raw"><span x-text="formatInteger(snapshot.telemetry_coverage.device_platforms)"></span> of <span x-text="formatInteger(snapshot.total_devices)"></span> devices populated</div>
+                </div>
+                <div class="panel coverage">
+                    <h3>Device Install ID</h3>
+                    <div class="pct" x-text="coveragePct(snapshot.telemetry_coverage.device_install_ids, snapshot.total_devices)"></div>
+                    <div class="raw"><span x-text="formatInteger(snapshot.telemetry_coverage.device_install_ids)"></span> of <span x-text="formatInteger(snapshot.total_devices)"></span> devices populated</div>
+                </div>
+            </div>
+
+            <div class="section-title">Data Quality</div>
+            <div class="metric-grid">
+                <div class="panel panel-pad">
+                    <h3>User Countries</h3>
+                    <div class="list" x-html="renderList(snapshot.user_country_mix, snapshot.total_users)"></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Device Platforms</h3>
+                    <div class="list" x-html="renderList(snapshot.device_platform_mix, snapshot.total_devices)"></div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Abuse Buckets</h3>
+                    <div class="list" x-html="renderList(snapshot.abuse_bucket_mix, snapshot.total_users)"></div>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="activeTab === 'launch'">
+            <div class="section-title">Launch Control</div>
+            <div class="launch-grid">
+                <div class="panel panel-pad">
+                    <h3>Rollout Flags</h3>
+                    <div class="stack">
+                        <label><input type="checkbox" x-model="launchControls.maintenance_mode"> Maintenance Mode</label>
+                        <label><input type="checkbox" x-model="launchControls.allow_public_signup"> Public Signup</label>
+                        <label><input type="checkbox" x-model="launchControls.allow_anonymous_signup"> Anonymous Signup</label>
+                        <label><input type="checkbox" x-model="launchControls.allow_connect"> Allow Connect</label>
+                        <label><input type="checkbox" x-model="launchControls.allow_paid_checkout"> Paid Checkout</label>
+                        <label><input type="checkbox" x-model="launchControls.healthy_only_routing"> Healthy-Only Routing</label>
+                        <label><input type="checkbox" x-model="launchControls.expose_paid_tiers"> Expose Paid Tiers</label>
+                        <div>
+                            <div class="mini" style="margin-bottom:6px;">Free beta label</div>
+                            <input type="text" x-model="launchControls.free_beta_label" placeholder="free-beta">
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                            <button class="action-btn" @click="saveLaunchControls()">Save Launch Controls</button>
+                            <span class="mini" x-text="launchMessage || 'No pending launch-control changes'"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-pad">
+                    <h3>Create Invite Code</h3>
+                    <div class="stack">
+                        <input type="text" x-model="inviteForm.code" placeholder="Optional code, e.g. POWER250">
+                        <select x-model="inviteForm.tier">
+                            <option value="pro">pro</option>
+                            <option value="escudo">escudo</option>
+                            <option value="dedicated">dedicated</option>
+                            <option value="free">free</option>
+                        </select>
+                        <input type="text" x-model="inviteForm.plan" placeholder="Plan name">
+                        <input type="number" x-model="inviteForm.duration_days" min="1" placeholder="Duration days">
+                        <input type="number" x-model="inviteForm.max_uses" min="1" placeholder="Max uses">
+                        <input type="text" x-model="inviteForm.cohort" placeholder="Cohort">
+                        <textarea x-model="inviteForm.notes" placeholder="Notes"></textarea>
+                        <button class="action-btn" @click="createInviteCode()">Create Invite</button>
+                        <span class="mini" x-text="inviteMessage || 'Latest invite codes appear below'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Live Invites</div>
+            <div class="panel panel-pad">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Tier</th>
+                                <th>Plan</th>
+                                <th>Uses</th>
+                                <th>Cohort</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="invite in inviteCodes" :key="invite.id">
+                                <tr>
+                                    <td>
+                                        <div x-text="invite.code"></div>
+                                        <div class="mini" x-text="invite.notes || ''"></div>
+                                    </td>
+                                    <td x-text="invite.tier"></td>
+                                    <td x-text="invite.plan"></td>
+                                    <td><span x-text="formatInteger(invite.used_count)"></span> / <span x-text="formatInteger(invite.max_uses)"></span></td>
+                                    <td x-text="invite.cohort || '—'"></td>
+                                    <td><span class="badge" :class="invite.active ? 'healthy' : 'blocked'" x-text="invite.active ? 'active' : 'inactive'"></span></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-title">Recent Sessions</div>
+            <div class="panel panel-pad">
+                <div class="table-wrap">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Device</th>
+                                <th>Server</th>
+                                <th>Tier</th>
+                                <th>Country</th>
+                                <th>Started</th>
+                                <th>Ended</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="session in recentSessions" :key="session.id">
+                                <tr>
+                                    <td x-text="session.user_id"></td>
+                                    <td x-text="session.device_id"></td>
+                                    <td x-text="session.server_id"></td>
+                                    <td x-text="session.tier"></td>
+                                    <td x-text="session.connect_country || '—'"></td>
+                                    <td x-text="formatDateTime(session.started_at)"></td>
+                                    <td x-text="formatDateTime(session.ended_at)"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-title">Journey Events</div>
+            <div class="panel panel-pad">
+                <div class="table-wrap">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>Event</th>
+                                <th>Outcome</th>
+                                <th>User</th>
+                                <th>Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="event in journeyEvents" :key="event.id">
+                                <tr>
+                                    <td x-text="formatDateTime(event.created_at)"></td>
+                                    <td x-text="event.event_type"></td>
+                                    <td><span class="badge" :class="event.outcome === 'success' ? 'healthy' : 'degraded'" x-text="event.outcome"></span></td>
+                                    <td x-text="event.user_id || '—'"></td>
+                                    <td x-text="event.detail || '—'"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="activeTab === 'family'">
+            <div class="section-title">Family Supervision</div>
+            <div class="hero-grid">
+                <div class="panel panel-pad">
+                    <h3>Child Profiles</h3>
+                    <div class="big blue" x-text="formatInteger(parental.total_children)"></div>
+                    <div class="sub"><span x-text="formatInteger(parental.linked_children)"></span> linked to a live child account</div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Child Devices</h3>
+                    <div class="big" x-text="formatInteger(parental.active_child_devices)"></div>
+                    <div class="sub">tracked supervised devices</div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Active Policies</h3>
+                    <div class="big amber" x-text="formatInteger(parental.active_policies)"></div>
+                    <div class="sub"><span x-text="formatInteger(parental.active_schedules)"></span> schedules currently defined</div>
+                </div>
+                <div class="panel panel-pad">
+                    <h3>Recent Family Events</h3>
+                    <div class="big green" x-text="formatInteger(parental.recent_events)"></div>
+                    <div class="sub">events in the last 24 hours</div>
+                </div>
+            </div>
+
+            <div class="section-title">Latest Child Events</div>
+            <div class="panel panel-pad">
+                <div class="table-wrap">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>Child</th>
+                                <th>Event</th>
+                                <th>App</th>
+                                <th>Action</th>
+                                <th>Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="event in parental.latest_events || []" :key="event.child_id + event.occurred_at + event.event_type">
+                                <tr>
+                                    <td x-text="formatDateTime(event.occurred_at)"></td>
+                                    <td x-text="event.child_name"></td>
+                                    <td x-text="event.event_type"></td>
+                                    <td x-text="event.app_identifier || '—'"></td>
+                                    <td x-text="event.action || '—'"></td>
+                                    <td x-text="event.detail || '—'"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function dashboard() {
+        return {
+            overview: {},
+            snapshot: {
+                telemetry_coverage: {},
+                plan_mix: [],
+                user_country_mix: [],
+                node_country_mix: [],
+                device_platform_mix: [],
+                usage_bucket_mix: [],
+                preferred_class_mix: [],
+                abuse_bucket_mix: []
+            },
+            alerts: [],
+            nodes: [],
+            launchControls: {
+                maintenance_mode: false,
+                allow_public_signup: true,
+                allow_anonymous_signup: true,
+                allow_connect: true,
+                allow_paid_checkout: false,
+                healthy_only_routing: true,
+                expose_paid_tiers: false,
+                free_beta_label: "free-beta"
+            },
+            inviteCodes: [],
+            recentSessions: [],
+            journeyEvents: [],
+            parental: {
+                total_children: 0,
+                linked_children: 0,
+                active_child_devices: 0,
+                active_policies: 0,
+                active_schedules: 0,
+                recent_events: 0,
+                latest_events: []
+            },
+            launchMessage: "",
+            inviteMessage: "",
+            inviteForm: {
+                code: "",
+                tier: "pro",
+                plan: "pro",
+                duration_days: 30,
+                max_uses: 25,
+                cohort: "beta-friends",
+                notes: ""
+            },
+            lastUpdate: "—",
+            statusText: "Loading live ops data",
+            search: "",
+            lifecycleFilter: "",
+            serviceFilter: "",
+            activeTab: "servers",
+            stateChart: null,
+            planChart: null,
+
+            async init() {
+                this.initCharts();
+                await this.fetchAll();
+                setInterval(() => this.fetchAll(), 10000);
+            },
+
+            initCharts() {
+                this.stateChart = new Chart(document.getElementById("stateChart").getContext("2d"), {
+                    type: "doughnut",
+                    data: {
+                        labels: ["Healthy", "Warm", "Degraded", "Blocked"],
+                        datasets: [{
+                            data: [0, 0, 0, 0],
+                            backgroundColor: ["#49d391", "#52b9ff", "#ffbf47", "#ff6d6d"],
+                            borderColor: "#122134",
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: "bottom", labels: { color: "#8fa5bc" } } }
+                    }
+                });
+
+                this.planChart = new Chart(document.getElementById("planChart").getContext("2d"), {
+                    type: "bar",
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            data: [],
+                            backgroundColor: ["#52b9ff", "#49d391", "#ffbf47", "#ff6d6d", "#8fa5bc"],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { ticks: { color: "#8fa5bc" }, grid: { display: false } },
+                            y: { ticks: { color: "#8fa5bc" }, grid: { color: "rgba(255,255,255,0.06)" } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            },
+
+            async fetchAll() {
+                try {
+                    const [alertsRes, overviewRes, snapshotRes, nodesRes, launchRes, inviteRes, sessionsRes, journeyRes, parentalRes] = await Promise.all([
+                        fetch("/admin/v1/ops/alerts"),
+                        fetch("/admin/v1/ops/overview"),
+                        fetch("/admin/v1/ops/snapshot"),
+                        fetch("/admin/v1/ops/nodes"),
+                        fetch("/admin/v1/ops/launch-controls"),
+                        fetch("/admin/v1/ops/invite-codes"),
+                        fetch("/admin/v1/ops/sessions"),
+                        fetch("/admin/v1/ops/journey-events"),
+                        fetch("/admin/v1/ops/parental-overview")
+                    ]);
+
+                    if (!alertsRes.ok || !overviewRes.ok || !snapshotRes.ok || !nodesRes.ok || !launchRes.ok || !inviteRes.ok || !sessionsRes.ok || !journeyRes.ok || !parentalRes.ok) {
+                        this.statusText = "Ops API request failed";
+                        return;
+                    }
+
+                    this.alerts = await alertsRes.json();
+                    this.overview = await overviewRes.json();
+                    this.snapshot = await snapshotRes.json();
+                    this.nodes = await nodesRes.json();
+                    this.launchControls = await launchRes.json();
+                    this.inviteCodes = await inviteRes.json();
+                    this.recentSessions = await sessionsRes.json();
+                    this.journeyEvents = await journeyRes.json();
+                    this.parental = await parentalRes.json();
+                    this.lastUpdate = new Date().toLocaleTimeString();
+                    this.statusText = this.buildStatus();
+                    this.updateCharts();
+                } catch (error) {
+                    console.error("Failed to fetch dashboard data", error);
+                    this.statusText = "Failed to fetch live ops data";
+                }
+            },
+
+            updateCharts() {
+                this.stateChart.data.datasets[0].data = [
+                    this.overview.healthy_nodes || 0,
+                    this.overview.warm_nodes || 0,
+                    this.overview.degraded_nodes || 0,
+                    this.overview.blocked_nodes || 0
+                ];
+                this.stateChart.update();
+
+                const planMix = this.snapshot.plan_mix || [];
+                this.planChart.data.labels = planMix.map(item => item.label);
+                this.planChart.data.datasets[0].data = planMix.map(item => item.count);
+                this.planChart.update();
+            },
+
+            buildStatus() {
+                const critical = (this.alerts || []).filter(alert => alert.severity === "critical").length;
+                const loginCoverage = this.coverageNumber(
+                    this.snapshot.telemetry_coverage.latest_login_country_users,
+                    this.snapshot.total_users
+                );
+                return `${this.filteredNodes.length} nodes visible, ${critical} critical alerts, login-country coverage ${loginCoverage.toFixed(0)}%`;
+            },
+
+            stateBadgeClass(state) {
+                if (state === "healthy") return "healthy";
+                if (state === "warm") return "warm";
+                if (state === "degraded") return "degraded";
+                if (state === "blocked") return "blocked";
+                return "other";
+            },
+
+            renderList(items, total) {
+                const rows = (items || []).slice(0, 8);
+                if (!rows.length) {
+                    return '<div class="empty">No live data yet.</div>';
+                }
+                return rows.map(item => {
+                    const pct = total ? Math.min(100, (Number(item.count) / Number(total)) * 100) : 0;
+                    return `
+                        <div class="list-row">
+                            <div class="name">${this.escapeHtml(item.label)}</div>
+                            <div class="bar"><span style="width:${pct.toFixed(1)}%"></span></div>
+                            <div class="count">${Number(item.count).toLocaleString()}</div>
+                        </div>
+                    `;
+                }).join("");
+            },
+
+            renderAlerts(items) {
+                const rows = items || [];
+                if (!rows.length) {
+                    return '<div class="empty">No active alerts.</div>';
+                }
+                return rows.map(item => `
+                    <div class="alert-card">
+                        <div class="alert-top">
+                            <div>${this.escapeHtml(item.title)}</div>
+                            <div class="count">${Number(item.count || 0).toLocaleString()}</div>
+                        </div>
+                        <div class="alert-meta">
+                            <span class="sev-${this.escapeHtml(item.severity)}">${this.escapeHtml(item.severity)}</span>
+                            <span>${this.escapeHtml(item.category)}</span>
+                        </div>
+                        <div class="sub">${this.escapeHtml(item.detail)}</div>
+                    </div>
+                `).join("");
+            },
+
+            planShareText() {
+                const total = Number(this.snapshot.total_users || 0);
+                const paid = Number(this.snapshot.paid_users || 0);
+                if (!total) return "0.0%";
+                return `${((paid / total) * 100).toFixed(1)}%`;
+            },
+
+            topLabel(items) {
+                return items && items.length ? items[0].label : "—";
+            },
+
+            coverageNumber(populated, total) {
+                if (!total) return 0;
+                return (Number(populated || 0) / Number(total)) * 100;
+            },
+
+            coveragePct(populated, total) {
+                return `${this.coverageNumber(populated, total).toFixed(1)}%`;
+            },
+
+            formatInteger(value) {
+                return value == null ? "—" : Number(value).toLocaleString();
+            },
+
+            formatNumber(value, digits = 0) {
+                return value == null ? "—" : Number(value).toFixed(digits);
+            },
+
+            formatPercent(value) {
+                return value == null ? "—" : `${Number(value).toFixed(1)}%`;
+            },
+
+            formatMbps(value) {
+                return value == null ? "—" : `${Number(value).toFixed(1)} Mbps`;
+            },
+
+            formatBytes(bytes) {
+                if (bytes == null) return "—";
+                const units = ["B", "KB", "MB", "GB", "TB", "PB"];
+                let value = Number(bytes);
+                let unit = 0;
+                while (value >= 1024 && unit < units.length - 1) {
+                    value /= 1024;
+                    unit += 1;
+                }
+                return `${value.toFixed(1)} ${units[unit]}`;
+            },
+
+            formatDateTime(value) {
+                if (!value) return "—";
+                return new Date(value).toLocaleString();
+            },
+
+            async saveLaunchControls() {
+                this.launchMessage = "Saving launch controls...";
+                const res = await fetch("/admin/v1/ops/launch-controls", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(this.launchControls)
+                });
+                this.launchMessage = res.ok ? "Launch controls saved" : "Failed to save launch controls";
+                if (res.ok) {
+                    this.launchControls = await res.json();
+                }
+            },
+
+            async createInviteCode() {
+                this.inviteMessage = "Creating invite code...";
+                const payload = {
+                    code: this.inviteForm.code || null,
+                    tier: this.inviteForm.tier,
+                    plan: this.inviteForm.plan || this.inviteForm.tier,
+                    duration_days: Number(this.inviteForm.duration_days || 30),
+                    max_uses: Number(this.inviteForm.max_uses || 1),
+                    cohort: this.inviteForm.cohort || null,
+                    notes: this.inviteForm.notes || null
+                };
+                const res = await fetch("/admin/v1/ops/invite-codes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    this.inviteMessage = "Failed to create invite code";
+                    return;
+                }
+                const created = await res.json();
+                this.inviteCodes.unshift(created);
+                this.inviteForm.code = "";
+                this.inviteMessage = `Created ${created.code}`;
+            },
+
+            escapeHtml(value) {
+                return String(value)
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+            },
+
+            get filteredNodes() {
+                return (this.nodes || []).filter(node => {
+                    const q = this.search.trim().toLowerCase();
+                    const haystack = [
+                        node.name,
+                        node.public_ip,
+                        node.location,
+                        node.provider || "",
+                        node.service_class
+                    ].join(" ").toLowerCase();
+                    const matchesSearch = !q || haystack.includes(q);
+                    const matchesLifecycle = !this.lifecycleFilter || node.lifecycle_state === this.lifecycleFilter;
+                    const matchesService = !this.serviceFilter || node.service_class === this.serviceFilter;
+                    return matchesSearch && matchesLifecycle && matchesService;
+                });
+            }
+        };
+    }
+    </script>
+</body>
+</html>

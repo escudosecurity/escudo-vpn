@@ -1,0 +1,47 @@
+{
+  "dashboard": {
+    "title": "Escudo VPN",
+    "uid": "escudo-vpn",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Active Peers",
+        "type": "gauge",
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+        "targets": [
+          { "expr": "escudo_active_peers", "legendFormat": "peers" }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Bandwidth Rate",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 6, "y": 0 },
+        "targets": [
+          { "expr": "rate(escudo_rx_bytes_total[5m])", "legendFormat": "RX bytes/s" },
+          { "expr": "rate(escudo_tx_bytes_total[5m])", "legendFormat": "TX bytes/s" }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "DNS Queries/sec",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "targets": [
+          { "expr": "rate(escudo_dns_queries_total[5m])", "legendFormat": "queries/s" }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "DNS Blocked/sec",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "targets": [
+          { "expr": "rate(escudo_dns_blocked_total[5m])", "legendFormat": "blocked/s" }
+        ]
+      }
+    ],
+    "time": { "from": "now-1h", "to": "now" },
+    "refresh": "10s"
+  }
+}

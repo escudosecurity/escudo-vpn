@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Seguranca Digital | Escudo VPN{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Indice de vulnerabilidade digital do Brasil. Proteja-se com Escudo VPN.{% endblock %}">
+  <link rel="canonical" href="{% block canonical %}https://escudovpn.com/seguranca-digital/{% endblock %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2300b4d8'/><path d='M50 20L25 35v20c0 15 10 27 25 32 15-5 25-17 25-32V35Z' fill='%23fff'/></svg>">
+  <style>
+    .seo-page { padding-top: 80px; }
+    .breadcrumb { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 2rem; }
+    .breadcrumb a { color: var(--text-dim); }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb span { margin: 0 0.4rem; }
+
+    .score-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1rem; border-radius: 999px;
+      font-weight: 700; font-size: 0.9rem;
+      font-family: var(--mono);
+    }
+
+    .seo-hero { text-align: left; padding: 2rem 0 3rem; }
+    .seo-hero h1 { margin-bottom: 1rem; font-size: clamp(1.8rem, 4vw, 2.8rem); }
+    .seo-hero .hero-desc { font-size: 1.05rem; color: var(--text-dim); max-width: 65ch; margin-bottom: 1.5rem; }
+
+    .metric-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1rem; margin: 2rem 0;
+    }
+    .metric-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem; text-align: center;
+    }
+    .metric-card .metric-value {
+      font-size: 2rem; font-weight: 700; color: var(--text-bright);
+      font-family: var(--mono);
+    }
+    .metric-card .metric-label {
+      font-size: 0.8rem; color: var(--text-dim); margin-top: 0.25rem;
+    }
+
+    .seo-section { padding: 3rem 0; border-top: 1px solid var(--border); }
+    .seo-section h2 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+    .seo-section h3 { font-size: 1.15rem; margin-bottom: 0.75rem; }
+
+    .data-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .data-table th, .data-table td {
+      padding: 0.6rem 1rem; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table th {
+      font-size: 0.75rem; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-dim); font-weight: 600;
+    }
+    .data-table td { font-size: 0.9rem; }
+
+    .bar-chart { margin: 1rem 0; }
+    .bar-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .bar-label { width: 60px; font-size: 0.85rem; color: var(--text-dim); text-align: right; font-family: var(--mono); }
+    .bar-track { flex: 1; height: 24px; background: var(--bg-raised); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding: 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: var(--bg); min-width: fit-content; }
+
+    .cta-box {
+      background: var(--bg-card); border: 1px solid var(--accent-dim);
+      border-radius: var(--radius); padding: 2.5rem; text-align: center;
+      margin: 2rem 0;
+    }
+    .cta-box h2 { margin-bottom: 0.75rem; }
+    .cta-box p { color: var(--text-dim); margin: 0 auto 1.5rem; }
+
+    .neighbor-grid {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;
+    }
+    .neighbor-link {
+      display: inline-block; padding: 0.4rem 0.8rem;
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: 6px; font-size: 0.85rem; color: var(--text);
+      transition: border-color .2s;
+    }
+    .neighbor-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    .state-list { columns: 2; column-gap: 2rem; margin: 1.5rem 0; }
+    .state-list a { display: block; padding: 0.3rem 0; font-size: 0.95rem; }
+
+    .muni-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem; margin: 1.5rem 0;
+    }
+    .muni-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem;
+      transition: border-color .2s;
+    }
+    .muni-card:hover { border-color: var(--accent); }
+    .muni-card .muni-name { font-weight: 600; color: var(--text-bright); font-size: 0.95rem; }
+    .muni-card .muni-score { font-family: var(--mono); font-size: 0.8rem; margin-top: 0.25rem; }
+
+    .progress-bar {
+      width: 100%; height: 8px; background: var(--bg-raised);
+      border-radius: 4px; overflow: hidden; margin-top: 0.5rem;
+    }
+    .progress-fill { height: 100%; border-radius: 4px; }
+
+    .risk-factors { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .risk-factor {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem;
+    }
+    .risk-factor .rf-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 0.25rem; }
+    .risk-factor .rf-value { font-size: 1.5rem; font-weight: 700; font-family: var(--mono); }
+    .risk-factor .rf-desc { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+    .steps-compact { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 1.5rem 0; counter-reset: step; }
+    .step-compact {
+      padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); counter-increment: step;
+    }
+    .step-compact::before {
+      content: counter(step); display: block; width: 28px; height: 28px;
+      line-height: 28px; text-align: center; background: var(--accent);
+      color: var(--bg); font-weight: 700; font-size: 0.8rem;
+      border-radius: 6px; margin-bottom: 0.75rem;
+    }
+    .step-compact h3 { font-size: 1rem; margin-bottom: 0.4rem; }
+    .step-compact p { font-size: 0.85rem; color: var(--text-dim); }
+
+    .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+    .profile-item { text-align: center; padding: 1rem; }
+    .profile-item .pi-value { font-size: 1.3rem; font-weight: 700; font-family: var(--mono); color: var(--text-bright); }
+    .profile-item .pi-label { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+    @media (max-width: 900px) {
+      .metric-grid { grid-template-columns: repeat(2, 1fr); }
+      .risk-factors { grid-template-columns: 1fr; }
+      .steps-compact { grid-template-columns: 1fr; }
+      .profile-grid { grid-template-columns: 1fr; }
+      .state-list { columns: 1; }
+    }
+    @media (max-width: 640px) {
+      .metric-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+
+  {% block structured_data %}{% endblock %}
+</head>
+<body>
+
+  <nav>
+    <div class="wrap">
+      <a href="/" class="nav-logo">
+        <div class="shield">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#06080d" stroke-width="2.5" stroke-linecap="round"><path d="M12 3L4 7v5c0 5.6 3.4 10.5 8 12 4.6-1.5 8-6.4 8-12V7l-8-4z"/></svg>
+        </div>
+        Escudo
+      </a>
+      <ul class="nav-links">
+        <li><a href="/#features">Recursos</a></li>
+        <li><a href="/#pricing">Planos</a></li>
+        <li><a href="/seguranca-digital/">Seguranca Digital</a></li>
+        <li><a href="/#download" class="nav-cta">Baixar gratis</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <main class="seo-page">
+    <div class="wrap">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="nav-logo">
+            <div class="shield">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#06080d" stroke-width="2.5" stroke-linecap="round"><path d="M12 3L4 7v5c0 5.6 3.4 10.5 8 12 4.6-1.5 8-6.4 8-12V7l-8-4z"/></svg>
+            </div>
+            Escudo
+          </a>
+          <p>VPN brasileira com protecao completa.<br>Seus dados, sua escolha.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Produto</h4>
+          <ul>
+            <li><a href="/#features">Recursos</a></li>
+            <li><a href="/#pricing">Planos</a></li>
+            <li><a href="/#download">Download</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Seguranca Digital</h4>
+          <ul>
+            <li><a href="/seguranca-digital/">Indice Nacional</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="/privacy.html">Privacidade</a></li>
+            <li><a href="/termos.html">Termos de uso</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Escudo VPN. Todos os direitos reservados.</span>
+        <span>Feito no Brasil</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

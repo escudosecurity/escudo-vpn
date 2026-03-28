@@ -1,0 +1,20 @@
+{
+  "name": "escudo-vpn",
+  "version": "1.0.0",
+  "description": "Escudo VPN - Brazilian VPN Client",
+  "private": true,
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "pwa:serve": "python3 -m http.server 4173 -d src",
+    "build:windows": "tauri build",
+    "bootstrap:windows": "powershell -ExecutionPolicy Bypass -File .\\scripts\\bootstrap-windows.ps1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2"
+  }
+}
