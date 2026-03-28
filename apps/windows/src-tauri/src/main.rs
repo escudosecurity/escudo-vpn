@@ -105,22 +105,26 @@ async fn scan_qr(raw_value: String, state: State<'_, AppState>) -> Result<String
 
 #[tauri::command]
 async fn get_launch_status(state: State<'_, AppState>) -> Result<LaunchStatusResponse, String> {
-    let token = state.token.lock().map_err(|e| e.to_string())?;
-    let token = token.as_ref().ok_or("Not logged in")?;
+    let token = {
+        let token = state.token.lock().map_err(|e| e.to_string())?;
+        token.as_ref().ok_or("Not logged in")?.clone()
+    };
     state
         .api
-        .get_launch_status(token)
+        .get_launch_status(&token)
         .await
         .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 async fn get_servers(state: State<'_, AppState>) -> Result<Vec<Server>, String> {
-    let token = state.token.lock().map_err(|e| e.to_string())?;
-    let token = token.as_ref().ok_or("Not logged in")?;
+    let token = {
+        let token = state.token.lock().map_err(|e| e.to_string())?;
+        token.as_ref().ok_or("Not logged in")?.clone()
+    };
     let servers = state
         .api
-        .get_servers(token)
+        .get_servers(&token)
         .await
         .map_err(|e| e.to_string())?;
     Ok(servers)
