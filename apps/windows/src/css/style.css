@@ -382,29 +382,24 @@ h3 {
   font-size: 13px;
 }
 
-.qr-ghost {
-  width: 96px;
-  height: 96px;
+.camera-target {
+  width: 112px;
+  height: 112px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  place-items: center;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.qr-ghost span {
-  display: block;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.86);
-}
-
-.qr-ghost span:nth-child(2),
-.qr-ghost span:nth-child(3),
-.qr-ghost span:nth-child(5),
-.qr-ghost span:nth-child(8),
-.qr-ghost span:nth-child(9),
-.qr-ghost span:nth-child(12),
-.qr-ghost span:nth-child(14),
-.qr-ghost span:nth-child(15) {
-  background: rgba(201, 168, 76, 0.95);
+.camera-target-frame {
+  width: 66px;
+  height: 66px;
+  border-radius: 20px;
+  border: 2px solid rgba(201, 168, 76, 0.95);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 0 24px rgba(201, 168, 76, 0.18);
 }
 
 #scanner-video {
