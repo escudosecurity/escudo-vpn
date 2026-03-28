@@ -22,6 +22,7 @@
   const loggedInValue = document.getElementById("logged-in-value");
   const vpnStateValue = document.getElementById("vpn-state-value");
   const selectedRouteValue = document.getElementById("selected-route-value");
+  const selectedRouteSummary = document.getElementById("selected-route-summary");
   const routeTitle = document.getElementById("route-title");
   const routeSubtitle = document.getElementById("route-subtitle");
   const residentialList = document.getElementById("residential-list");
@@ -120,6 +121,7 @@
         routeTitle.textContent = category === "Standard" ? server.location : category;
         routeSubtitle.textContent = `Selected ${category} route on ${server.location}.`;
         selectedRouteValue.textContent = category === "Standard" ? server.location : category;
+        selectedRouteSummary.textContent = `${category === "Standard" ? server.location : category} selected`;
         connectBtn.disabled = !prereqs.wireguard_installed;
         renderServers();
       });
@@ -143,6 +145,7 @@
       loggedInValue.textContent = status.logged_in ? "Signed in" : "Offline";
       vpnStateValue.textContent = status.vpn.connected ? "Connected" : "Disconnected";
       selectedRouteValue.textContent = status.vpn.server_name || "None";
+      selectedRouteSummary.textContent = status.vpn.server_name || (selectedServer ? selectedServer.location : "No route selected");
       disconnectBtn.disabled = !status.vpn.connected;
 
       if (status.logged_in) {
@@ -173,6 +176,10 @@
           ? "Windows is ready."
           : "Install the missing components once, then pair and connect."
       );
+      const prereqSurface = document.querySelector(".prereq-surface");
+      if (prereqSurface) {
+        prereqSurface.style.display = prereqs.wireguard_installed && prereqs.webview2_installed ? "none" : "";
+      }
     } catch (error) {
       setPrereqMessage(error.message || String(error), true);
     }
@@ -202,6 +209,7 @@
       setMessage("Signed in on Windows.");
       await refreshStatus();
       await refreshServers();
+      routeSubtitle.textContent = "Choose a route below, then connect.";
     } catch (error) {
       setMessage(error.message || String(error), true);
     }
@@ -235,6 +243,7 @@
         serverLocation: selectedServer.location
       });
       setMessage(`Connected to ${selectedServer.location}.`);
+      selectedRouteSummary.textContent = `${selectedServer.location} active`;
       await refreshStatus();
     } catch (error) {
       setMessage(error.message || String(error), true);
@@ -245,6 +254,7 @@
     try {
       await invoke("disconnect");
       setMessage("Disconnected.");
+      selectedRouteSummary.textContent = selectedServer ? `${selectedServer.location} selected` : "No route selected";
       await refreshStatus();
     } catch (error) {
       setMessage(error.message || String(error), true);
